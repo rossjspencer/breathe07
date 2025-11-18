@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:padding="8dp">
 
-    <!-- Buttons to switch between the two log types -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,47 +15,74 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Controller Logs" />
+            android:text="View Controller Logs" />
 
         <Button
             android:id="@+id/rescueButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Rescue Logs" />
+            android:text="View Rescue Logs" />
+
     </LinearLayout>
 
-    <!-- Header row to look like a table -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/addEntryButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add New Entry" />
+
+        <Button
+            android:id="@+id/removeEntryButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Remove Entry" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/headerRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
         android:paddingBottom="4dp">
 
         <TextView
+            android:id="@+id/headerTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.2"
             android:text="Time"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="start" />
 
         <TextView
+            android:id="@+id/headerDose"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Dose"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="start" />
 
         <TextView
+            android:id="@+id/headerType"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Type"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="start" />
     </LinearLayout>
 
-    <!-- RecyclerView: this will show the log entries like a table body -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/logRecyclerView"
         android:layout_width="match_parent"

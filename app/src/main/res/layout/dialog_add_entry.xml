@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dose Count" />
+
+    <EditText
+        android:id="@+id/editDose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type" />
+
+    <RadioGroup
+        android:id="@+id/radioTypeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioController"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Controller"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radioRescue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rescue" />
+    </RadioGroup>
+
+</LinearLayout>
