@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.smartair"
+    namespace = "com.b07.asthmaid"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.smartair"
+        applicationId = "com.b07.asthmaid"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -40,6 +40,9 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.androidx.junit)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

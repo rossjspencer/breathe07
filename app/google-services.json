@@ -8,6 +8,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1716127770:android:667eec97bf0d19e71329a3",
+        "android_client_info": {
+          "package_name": "com.b07.asthmaid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVdxtdhr5yK3fiiGpQ_Ld8UsxPCxhE_8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1716127770:android:ede910b0d1b12b521329a3",
         "android_client_info": {
           "package_name": "com.example.smartair"
