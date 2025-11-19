@@ -38,12 +38,7 @@
             android:layout_weight="1"
             android:text="Add New Entry" />
 
-        <Button
-            android:id="@+id/removeEntryButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Remove Entry" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -81,6 +76,11 @@
             android:text="Type"
             android:textStyle="bold"
             android:gravity="start" />
+
+        <!-- aligns headers with delete button -->
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

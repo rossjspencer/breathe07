@@ -11,19 +11,35 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1.2"
-        android:gravity="start" />
+        android:gravity="center_vertical" />
 
     <TextView
         android:id="@+id/tvDose"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="start" />
+        android:gravity="center_vertical" />
 
     <TextView
         android:id="@+id/tvType"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="start" />
+        android:gravity="center_vertical" />
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="0dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:gravity="center_vertical"/>
+    </FrameLayout>
 </LinearLayout>

@@ -41,7 +41,15 @@ public class MedicineLog {
         return rescueLogs.contains(entry);
     }
 
-    protected void removeEntry(ControllerLogEntry entry){
+    public void removeEntry(MedicineLogEntry entry) {
+        if (entry instanceof ControllerLogEntry) {
+            removeControllerEntry((ControllerLogEntry) entry);
+        }
+        else if (entry instanceof RescueLogEntry) {
+            removeRescueEntry((RescueLogEntry) entry);
+        }
+    }
+    protected void removeControllerEntry(ControllerLogEntry entry){
 
         if (controllerLogs.contains(entry)){
             controllerLogs.remove(entry);
@@ -51,7 +59,7 @@ public class MedicineLog {
         }
     }
 
-    protected void removeEntry(RescueLogEntry entry){
+    protected void removeRescueEntry(RescueLogEntry entry){
 
         if (rescueLogs.contains(entry)){
             rescueLogs.remove(entry);

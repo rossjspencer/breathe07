@@ -3,6 +3,7 @@ package com.b07.asthmaid.r3;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,11 @@ import java.util.ArrayList;
 public class LogDisplayHandler extends RecyclerView.Adapter<LogDisplayHandler.ViewHolder> {
 
     private ArrayList<MedicineLogEntry> entries = new ArrayList<>();
+    private final MedicineLogFragment fragment;
+
+    public LogDisplayHandler(MedicineLogFragment fragment) {
+        this.fragment = fragment;
+    }
 
     // shows new list
     public void setEntries(ArrayList<? extends MedicineLogEntry> newEntries) {
@@ -44,17 +50,19 @@ public class LogDisplayHandler extends RecyclerView.Adapter<LogDisplayHandler.Vi
         return entries.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView timestampView;
         TextView doseView;
         TextView typeView;
+        ImageButton deleteButton;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             timestampView = itemView.findViewById(R.id.tvTimestamp);
             doseView = itemView.findViewById(R.id.tvDose);
             typeView = itemView.findViewById(R.id.tvType);
+            deleteButton = itemView.findViewById(R.id.btnDelete);
         }
 
         void bind(MedicineLogEntry entry) {
@@ -68,6 +76,10 @@ public class LogDisplayHandler extends RecyclerView.Adapter<LogDisplayHandler.Vi
             } else {
                 typeView.setText("Unknown");
             }
+
+            deleteButton.setOnClickListener(v -> {
+                fragment.showDeleteConfirmDialog(entry);
+            });
         }
     }
 }

@@ -44,7 +44,8 @@ public class MedicineLogFragment extends Fragment {
         Button rescueButton = view.findViewById(R.id.rescueButton);
         Button addEntryButton = view.findViewById(R.id.addEntryButton);
 
-        displayHandler = new LogDisplayHandler();
+        displayHandler = new LogDisplayHandler(this);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(displayHandler);
 
@@ -135,6 +136,25 @@ public class MedicineLogFragment extends Fragment {
                         if (currentType == LogType.RESCUE) {
                             showRescueLogs();
                         }
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    public void showDeleteConfirmDialog(MedicineLogEntry entry) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Delete Entry")
+                .setMessage("Are you sure you want to delete this entry?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+
+                    medicineLog.removeEntry(entry);
+
+                    // refresh list
+                    if (currentType == LogType.CONTROLLER) {
+                        showControllerLogs();
+                    } else {
+                        showRescueLogs();
                     }
                 })
                 .setNegativeButton("Cancel", null)
