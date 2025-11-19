@@ -1,60 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="24dp"
+android:gravity="center_vertical">
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Create Account"
+    android:textSize="28sp"
+    android:textStyle="bold"
+    android:layout_marginBottom="32dp" />
+
+<EditText
+    android:id="@+id/firstname_edittext"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp"
-    android:background="#DCE8D8">
+    android:layout_height="wrap_content"
+    android:hint="First Name"
+    android:inputType="textPersonName"
+    android:minHeight="48dp" />
 
-    <!-- App Title -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ASTHMAID"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:textColor="#555555"
-        android:fontFamily="sans-serif-medium"
-        android:layout_marginBottom="60dp" />
+<EditText
+    android:id="@+id/lastname_edittext"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:hint="Last Name"
+    android:inputType="textPersonName"
+    android:minHeight="48dp" />
 
-    <!-- Email Input -->
-    <EditText
-        android:id="@+id/email_edittext"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        android:hint="Email"
-        android:padding="12dp"
-        android:background="@drawable/rounded_input"
-        android:layout_marginBottom="16dp" />
+<EditText
+    android:id="@+id/email_edittext"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:hint="Email"
+    android:inputType="textEmailAddress"
+    android:minHeight="48dp" />
 
-    <!-- Password Input -->
-    <EditText
-        android:id="@+id/password_edittext"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:background="@drawable/rounded_input"
-        android:layout_marginBottom="16dp" />
+<EditText
+    android:id="@+id/password_edittext"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:hint="Password"
+    android:inputType="textPassword"
+    android:minHeight="48dp" />
 
-    <!-- Role Spinner -->
-    <Spinner
-        android:id="@+id/role_spinner"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        android:background="@drawable/rounded_input"
-        android:layout_marginBottom="24dp" />
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="24dp"
+    android:text="I am a..." />
 
-    <!-- Register Button -->
-    <Button
-        android:id="@+id/register_button"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Register"
-        android:textColor="#000000"
-        android:background="@drawable/rounded_button" />
+<Spinner
+    android:id="@+id/role_spinner"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:minHeight="48dp" />
+
+<Button
+    android:id="@+id/register_button"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="32dp"
+    android:text="Register" />
 
 </LinearLayout>
-

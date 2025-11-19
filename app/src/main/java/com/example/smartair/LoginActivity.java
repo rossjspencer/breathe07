@@ -71,8 +71,15 @@ public class LoginActivity extends AppCompatActivity {
                                             } else if (role.equals("Provider")) {
                                                 startActivity(new Intent(LoginActivity.this, ProviderHomeActivity.class));
                                                 finish();
+                                            } else if (role.equals("Child")) {
+                                                startActivity(new Intent(LoginActivity.this, ChildHomeActivity.class));
+                                                finish();
                                             }
-                                        } else {
+                                            else {
+                                                Toast.makeText(LoginActivity.this, "Invalid role!", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                        else {
                                             Toast.makeText(LoginActivity.this, "Role not found!", Toast.LENGTH_LONG).show();
                                         }
                                     } else {

@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartAir">
+        <activity android:name=".ChildHomeActivity" />
         <activity android:name=".ParentHomeActivity" />
         <activity android:name=".ProviderHomeActivity" />
         <activity
