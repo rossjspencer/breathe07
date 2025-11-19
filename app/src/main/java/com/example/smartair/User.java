@@ -13,6 +13,7 @@ public class User {
     public String role;
     public String pairingCode;
     public Map<String, Boolean> linkedChildren = new HashMap<>();
+    public int asthmaScore=100;
 
     public User() {
     }
