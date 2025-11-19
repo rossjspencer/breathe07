@@ -36,13 +36,15 @@ android:padding="16dp">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/tvInstructions" />
 
-<Button
-    android:id="@+id/btnLinkChild"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="+ Link New Child"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent" />
+    <Button
+        android:id="@+id/btnLinkChild"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="+ Link New Child"
+        android:textColor="#006108"
+        app:iconTint="#E90D0D"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

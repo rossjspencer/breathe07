@@ -1,13 +1,5 @@
 <resources>
 <string name="app_name">Smart Air</string>
-<string name="create_account">Create Account</string>
-<string name="prompt_first_name">First Name</string>
-<string name="prompt_last_name">Last Name</string>
-<string name="prompt_email">Email</string>
-<string name="prompt_password">Password</string>
-<string name="label_role">I am a…</string>
-<string name="btn_register">Register</string>
-
 <string-array name="roles_array">
     <item>Parent</item>
     <item>Child</item>
