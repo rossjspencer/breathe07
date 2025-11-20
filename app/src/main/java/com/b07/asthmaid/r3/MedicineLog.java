@@ -68,4 +68,9 @@ public class MedicineLog {
             System.out.println("Entry does not exist.");
         }
     }
+
+    public void clear() {
+        controllerLogs.clear();
+        rescueLogs.clear();
+    }
 }
