@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
@@ -13,24 +12,47 @@ android:gravity="center_vertical">
     android:text="Create Account"
     android:textSize="28sp"
     android:textStyle="bold"
-    android:layout_marginBottom="32dp" />
+    android:layout_marginBottom="24dp" />
 
-<EditText
-    android:id="@+id/firstname_edittext"
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="I am a..." />
+
+<Spinner
+    android:id="@+id/role_spinner"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="First Name"
-    android:inputType="textPersonName"
+    android:layout_marginBottom="16dp"
     android:minHeight="48dp" />
 
-<EditText
-    android:id="@+id/lastname_edittext"
+<LinearLayout
+    android:id="@+id/layout_names"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"
-    android:hint="Last Name"
-    android:inputType="textPersonName"
-    android:minHeight="48dp" />
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/firstname_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="First Name"
+        android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/lastname_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Last Name"
+        android:inputType="textPersonName" />
+</LinearLayout>
+
+<EditText
+    android:id="@+id/providername_edittext"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Provider/Clinic Name (Must be Unique)"
+    android:visibility="gone"
+    android:inputType="textPersonName" />
 
 <EditText
     android:id="@+id/email_edittext"
@@ -38,8 +60,7 @@ android:gravity="center_vertical">
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
     android:hint="Email"
-    android:inputType="textEmailAddress"
-    android:minHeight="48dp" />
+    android:inputType="textEmailAddress" />
 
 <EditText
     android:id="@+id/password_edittext"
@@ -47,21 +68,7 @@ android:gravity="center_vertical">
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
     android:hint="Password"
-    android:inputType="textPassword"
-    android:minHeight="48dp" />
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:text="I am a..." />
-
-<Spinner
-    android:id="@+id/role_spinner"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:minHeight="48dp" />
+    android:inputType="textPassword" />
 
 <Button
     android:id="@+id/register_button"

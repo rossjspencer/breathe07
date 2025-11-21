@@ -1,12 +1,10 @@
 package com.example.smartair;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,7 +28,11 @@ public class ParentHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_parent_home);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        currentParentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Safety check: if parent isn't logged in, don't crash
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            currentParentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
 
         // 1. Setup List
         recyclerView = findViewById(R.id.rvLinkedChildren);
@@ -39,12 +41,25 @@ public class ParentHomeActivity extends AppCompatActivity {
         adapter = new ChildAdapter(childList);
         recyclerView.setAdapter(adapter);
 
-        // 2. Setup Button
+        // 2. Setup Button (Now Redirects to AddChildActivity)
         Button btnLink = findViewById(R.id.btnLinkChild);
-        btnLink.setOnClickListener(v -> showLinkChildDialog());
+
+        // Optional: Update text programmatically to reflect new behavior
+        btnLink.setText("+ Register New Child");
+
+        btnLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // OLD WAY: showLinkChildDialog();
+                // NEW WAY: Open the registration screen
+                startActivity(new Intent(ParentHomeActivity.this, AddChildActivity.class));
+            }
+        });
 
         // 3. Load Data
-        loadLinkedChildren();
+        if (currentParentId != null) {
+            loadLinkedChildren();
+        }
     }
 
     private void loadLinkedChildren() {
@@ -52,10 +67,14 @@ public class ParentHomeActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        childList.clear();
+                        childList.clear(); // Clear list to prevent duplicates
                         for (DataSnapshot data : snapshot.getChildren()) {
                             String childUid = data.getKey();
                             fetchChildDetails(childUid);
+                        }
+                        // If no children, notify adapter to clear view
+                        if (!snapshot.exists()) {
+                            adapter.notifyDataSetChanged();
                         }
                     }
                     @Override
@@ -63,71 +82,39 @@ public class ParentHomeActivity extends AppCompatActivity {
                 });
     }
 
+    // REPLACE THE OLD fetchChildDetails WITH THIS ONE
     private void fetchChildDetails(String childUid) {
-        mDatabase.child("users").child(childUid).addListenerForSingleValueEvent(new ValueEventListener() {
+        // Changed from addListenerForSingleValueEvent to addValueEventListener
+        mDatabase.child("users").child(childUid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User child = snapshot.getValue(User.class);
-                if (child != null) {
-                    // Since ID isn't inside the object by default, we can set it manually if needed
-                    child.userId = childUid;
-                    childList.add(child);
-                    adapter.notifyDataSetChanged();
+                User updatedChild = snapshot.getValue(User.class);
+                if (updatedChild != null) {
+                    updatedChild.userId = childUid;
+
+                    // LOGIC: Check if child is already in the list
+                    int index = -1;
+                    for (int i = 0; i < childList.size(); i++) {
+                        if (childList.get(i).userId.equals(childUid)) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index != -1) {
+                        // Child exists -> Update their data
+                        childList.set(index, updatedChild);
+                        adapter.notifyItemChanged(index);
+                    } else {
+                        // New child -> Add to list
+                        childList.add(updatedChild);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
-        });
-    }
-
-    private void showLinkChildDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Link Child Account");
-        builder.setMessage("Enter the 6-character code from the Child's app:");
-
-        final EditText input = new EditText(this);
-        builder.setView(input);
-
-        builder.setPositiveButton("Link", (dialog, which) -> {
-            String code = input.getText().toString().trim().toUpperCase();
-            linkChildAccount(code);
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
-    }
-
-    private void linkChildAccount(String inputCode) {
-        if (inputCode == null || inputCode.length() < 6) {
-            Toast.makeText(this, "Invalid code format", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Query query = mDatabase.child("users").orderByChild("pairingCode").equalTo(inputCode);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                        String childUid = childSnapshot.getKey();
-                        if (childUid.equals(currentParentId)) {
-                            Toast.makeText(ParentHomeActivity.this, "Cannot link to yourself", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        // Save link
-                        mDatabase.child("users").child(currentParentId)
-                                .child("linkedChildren").child(childUid).setValue(true)
-                                .addOnSuccessListener(aVoid -> Toast.makeText(ParentHomeActivity.this, "Child Linked!", Toast.LENGTH_SHORT).show());
-                    }
-                } else {
-                    Toast.makeText(ParentHomeActivity.this, "No child found with that code.", Toast.LENGTH_LONG).show();
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ParentHomeActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
         });
     }
 }

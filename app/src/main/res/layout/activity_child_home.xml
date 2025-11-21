@@ -3,45 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp"
+    android:padding="24dp"
+    android:gravity="center_horizontal"
     android:background="#FFFFFF">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your Pairing Code"
+        android:text="Child Dashboard"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#333333" />
+        android:layout_marginBottom="32dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Show this to your parent"
-        android:textSize="16sp"
-        android:textColor="#666666" />
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#F5F5F5"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/tvPairingCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="40dp"
-        android:text="......"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.2"
-        android:textColor="#000000"
-        android:background="#F0F0F0"
-        android:padding="16dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="This code will allow your parent to link to your account to help manage your asthma."
-        android:gravity="center"
-        android:textSize="14sp"
-        android:textColor="#666666" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current Zone"
+                android:textSize="16sp"
+                android:textColor="#666666"/>
+
+            <TextView
+                android:id="@+id/tvCurrentZone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--%"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:layout_marginVertical="8dp"
+                android:textColor="#333333"/>
+
+            <TextView
+                android:id="@+id/tvZoneDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No logs yet"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btnLogPef"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Log Peak Flow"
+        android:textSize="18sp"
+        android:backgroundTint="#2196F3" />
 
 </LinearLayout>
