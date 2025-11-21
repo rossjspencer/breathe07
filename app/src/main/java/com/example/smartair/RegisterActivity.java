@@ -1,38 +1,40 @@
 package com.example.smartair;
 
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.AuthResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText emailTextView, passwordTextView;
-    private Button button;
-    private FirebaseAuth auth;
-
+    private EditText emailField, passwordField;
     private Spinner roleSpinner;
-    private DatabaseReference databaseRef;
+    private Button registerBtn;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        roleSpinner = findViewById(R.id.role_spinner);
-        databaseRef = FirebaseDatabase.getInstance().getReference("users");
+        // Firebase auth instance
+        auth = FirebaseAuth.getInstance();
 
+        // UI references
+        emailField = findViewById(R.id.email_edittext);
+        passwordField = findViewById(R.id.password_edittext);
+        roleSpinner = findViewById(R.id.role_spinner);
+        registerBtn = findViewById(R.id.register_button);
 
         // Load roles from strings.xml
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -40,62 +42,48 @@ public class RegisterActivity extends AppCompatActivity {
                 R.array.roles_array,
                 android.R.layout.simple_spinner_item
         );
-
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roleSpinner.setAdapter(adapter);
 
-        // Initialize FirebaseAuth instance
-        auth = FirebaseAuth.getInstance();
-
-        emailTextView = findViewById(R.id.email_edittext);
-        passwordTextView = findViewById(R.id.password_edittext);
-        button = findViewById(R.id.register_button);
-
-        button.setOnClickListener(v -> registerNewUser());
+        registerBtn.setOnClickListener(v -> registerUser());
     }
 
-    private void registerNewUser() {
-        // Get values from input fields
-        String email = emailTextView.getText().toString().trim();
-        String password = passwordTextView.getText().toString().trim();
-        String selectedRole = roleSpinner.getSelectedItem().toString();
+    private void registerUser() {
+        String email = emailField.getText().toString().trim();
+        String password = passwordField.getText().toString().trim();
+        String role = roleSpinner.getSelectedItem().toString();
 
-
-        // Validate input
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please enter credentials", Toast.LENGTH_LONG).show();
+        // Validate inputs
+        if (!AuthHelper.validateCredentials(email, password)) {
+            AuthHelper.showToast(this, "Please enter all fields");
             return;
         }
 
-        // Register new user with Firebase
+        // Create user in Firebase Auth
         auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            String uid = task.getResult().getUser().getUid();
-                            String selectedRole = roleSpinner.getSelectedItem().toString();
-                            String email = emailTextView.getText().toString().trim();
+                .addOnCompleteListener(this, task -> {
 
-                            // Create a user object
-                            User newUser = new User(email, selectedRole);
-
-                            // Save to database
-                            databaseRef.child(uid).setValue(newUser)
-                                    .addOnCompleteListener(dbTask -> {
-                                        if (dbTask.isSuccessful()) {
-                                            Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_LONG).show();
-                                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
-                                            finish();
-                                        } else {
-                                            Toast.makeText(RegisterActivity.this, "Database error!", Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Registration failed! Please try again later", Toast.LENGTH_LONG).show();
-                        }
+                    if (!task.isSuccessful()) {
+                        AuthHelper.showToast(this, "Registration failed");
+                        return;
                     }
+
+                    // Get user UID
+                    String uid = task.getResult().getUser().getUid();
+
+                    // Save user object in Firebase Database
+                    User user = new User(email, role);
+                    DatabaseReference ref = AuthHelper.getUserRef(uid);
+
+                    ref.setValue(user).addOnCompleteListener(dbTask -> {
+                        if (dbTask.isSuccessful()) {
+                            AuthHelper.showToast(this, "Registration successful!");
+                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                            finish();
+                        } else {
+                            AuthHelper.showToast(this, "Database error!");
+                        }
+                    });
                 });
     }
 }
