@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name" />
+
+        <EditText
+            android:id="@+id/editInventoryName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="12" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Purchase Date (yyyy-MM-dd)" />
+
+        <EditText
+            android:id="@+id/editPurchaseDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Expiry Date (yyyy-MM-dd)" />
+
+        <EditText
+            android:id="@+id/editExpiryDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="% Left" />
+
+        <EditText
+            android:id="@+id/editPercentLeft"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Type" />
+
+        <RadioGroup
+            android:id="@+id/radioInventoryTypeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioInventoryController"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Controller" />
+
+            <RadioButton
+                android:id="@+id/radioInventoryRescue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rescue" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Marked by" />
+
+        <RadioGroup
+            android:id="@+id/radioWhoGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioParent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Parent" />
+
+            <RadioButton
+                android:id="@+id/radioChild"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Child" />
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>

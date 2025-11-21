@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.b07.asthmaid.r3.InventoryFragment;
 import com.b07.asthmaid.r3.MedicineLogFragment;
 
 public class HomeFragment extends Fragment {
@@ -23,12 +24,19 @@ public class HomeFragment extends Fragment {
         Button buttonScroller = view.findViewById(R.id.buttonScroller);
         Button buttonSpinner = view.findViewById(R.id.buttonSpinner);
         Button buttonManageItems = view.findViewById(R.id.buttonManageItems);
-        Button buttonMedicineLog = view.findViewById(R.id.btnMedicineLog);
+        Button buttonMedicineLog = view.findViewById(R.id.buttonMedicineLog);
+        Button buttonInventory = view.findViewById(R.id.buttonInventory);
+
+        buttonInventory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { loadFragment(new InventoryFragment()); }
+        });
 
         buttonMedicineLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { loadFragment(new MedicineLogFragment()); }
         });
+
 
         buttonRecyclerView.setOnClickListener(new View.OnClickListener() {
             @Override
