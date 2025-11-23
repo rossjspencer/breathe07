@@ -7,62 +7,22 @@
     tools:context=".HomeFragment">
 
     <Button
-        android:id="@+id/buttonRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/recyclerview"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/buttonScroller"/>
-
-    <Button
-        android:id="@+id/buttonScroller"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/scroller"
-        app:layout_constraintTop_toBottomOf="@+id/buttonRecyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSpinner"/>
-
-    <Button
-        android:id="@+id/buttonSpinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/spinner"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonScroller" />
-
-    <Button
-        android:id="@+id/buttonManageItems"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/manage_items"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonSpinner"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
         android:id="@+id/buttonMedicineLog"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Open Medicine Log"
-        app:layout_constraintTop_toBottomOf="@+id/buttonManageItems"
+        app:layout_constraintBottom_toTopOf="@+id/buttonInventory"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
         android:id="@+id/buttonInventory"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Open Inventory"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@+id/buttonMedicineLog"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
