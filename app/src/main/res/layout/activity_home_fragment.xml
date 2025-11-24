@@ -26,6 +26,17 @@
         app:layout_constraintTop_toBottomOf="@+id/buttonMedicineLog"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonGuide" />
+
+    <Button
+        android:id="@+id/buttonGuide"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Inhaler Guide"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/buttonInventory"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

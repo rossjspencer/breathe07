@@ -22,6 +22,7 @@ public class HomeFragment extends Fragment {
 
         Button buttonMedicineLog = view.findViewById(R.id.buttonMedicineLog);
         Button buttonInventory = view.findViewById(R.id.buttonInventory);
+        Button buttonGuide = view.findViewById(R.id.buttonGuide);
 
         buttonInventory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -31,6 +32,13 @@ public class HomeFragment extends Fragment {
         buttonMedicineLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { loadFragment(new MedicineLogFragment()); }
+        });
+
+        buttonGuide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadFragment(new InhalerGuideFragment());
+            }
         });
 
         return view;
