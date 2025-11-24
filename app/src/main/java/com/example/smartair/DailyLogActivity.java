@@ -20,13 +20,10 @@ public class DailyLogActivity extends AppCompatActivity {
     private TextView severityValueText;
     private EditText notesInput;
     private Button saveButton;
-
     // Symptoms CheckBoxes
     private CheckBox cbCough, cbWheezing, cbShortness, cbChest;
-
     // Triggers CheckBoxes
     private CheckBox cbDust, cbPollen, cbSmoke, cbExercise;
-
     private DatabaseReference databaseRef;
     private FirebaseAuth auth;
 
@@ -34,10 +31,8 @@ public class DailyLogActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_log);
-
         auth = FirebaseAuth.getInstance();
         databaseRef = FirebaseDatabase.getInstance().getReference("logs");
-
         initializeViews();
         setupListeners();
     }
@@ -47,13 +42,11 @@ public class DailyLogActivity extends AppCompatActivity {
         severityValueText = findViewById(R.id.severity_value_text);
         notesInput = findViewById(R.id.notes_input);
         saveButton = findViewById(R.id.save_log_button);
-
         // Symptoms
         cbCough = findViewById(R.id.cb_cough);
         cbWheezing = findViewById(R.id.cb_wheezing);
         cbShortness = findViewById(R.id.cb_shortness);
         cbChest = findViewById(R.id.cb_chest);
-
         // Triggers
         cbDust = findViewById(R.id.cb_dust);
         cbPollen = findViewById(R.id.cb_pollen);
@@ -70,14 +63,12 @@ public class DailyLogActivity extends AppCompatActivity {
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-
         saveButton.setOnClickListener(v -> saveLog());
     }
 
     private void saveLog() {
         String uid = auth.getCurrentUser().getUid();
         if (uid == null) return;
-
         List<String> symptoms = new ArrayList<>();
         if (cbCough.isChecked()) symptoms.add("Cough");
         if (cbWheezing.isChecked()) symptoms.add("Wheezing");
@@ -93,15 +84,14 @@ public class DailyLogActivity extends AppCompatActivity {
         int severity = severitySeekBar.getProgress();
         String notes = notesInput.getText().toString();
         long timestamp = System.currentTimeMillis();
-
         SymptomLog log = new SymptomLog(timestamp, symptoms, triggers, severity, notes);
-
         String logId = databaseRef.child(uid).push().getKey();
+
         if (logId != null) {
             databaseRef.child(uid).child(logId).setValue(log)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(DailyLogActivity.this, "Log saved successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DailyLogActivity.this, "Log saved!", Toast.LENGTH_SHORT).show();
                         finish();
                     } else {
                         Toast.makeText(DailyLogActivity.this, "Failed to save log.", Toast.LENGTH_SHORT).show();
