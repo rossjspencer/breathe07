@@ -88,12 +88,14 @@ public class RegisterActivity extends AppCompatActivity {
                                             startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                                             finish();
                                         } else {
-                                            Toast.makeText(RegisterActivity.this, "Database error!", Toast.LENGTH_LONG).show();
+                                            String dbError = dbTask.getException() != null ? dbTask.getException().getMessage() : "Unknown DB error";
+                                            Toast.makeText(RegisterActivity.this, "Database error: " + dbError, Toast.LENGTH_LONG).show();
                                         }
                                     });
 
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Registration failed! Please try again later", Toast.LENGTH_LONG).show();
+                            String error = task.getException() != null ? task.getException().getMessage() : "Unknown Auth error";
+                            Toast.makeText(RegisterActivity.this, "Registration failed: " + error, Toast.LENGTH_LONG).show();
                         }
                     }
                 });

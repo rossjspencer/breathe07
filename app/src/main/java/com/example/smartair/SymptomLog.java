@@ -1,0 +1,23 @@
+package com.example.smartair;
+
+import java.util.List;
+
+public class SymptomLog {
+    public long timestamp;
+    public List<String> symptoms;
+    public List<String> triggers;
+    public int severity;
+    public String notes;
+
+    public SymptomLog() {
+        // Required empty constructor for Firebase
+    }
+
+    public SymptomLog(long timestamp, List<String> symptoms, List<String> triggers, int severity, String notes) {
+        this.timestamp = timestamp;
+        this.symptoms = symptoms;
+        this.triggers = triggers;
+        this.severity = severity;
+        this.notes = notes;
+    }
+}

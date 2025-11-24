@@ -82,12 +82,13 @@ public class LoginActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onCancelled(DatabaseError error) {
-                                    Toast.makeText(LoginActivity.this, "Database error!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             });
                         }
                         else {
-                            Toast.makeText(LoginActivity.this, "Login failed!!", Toast.LENGTH_LONG).show();
+                            String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                            Toast.makeText(LoginActivity.this, "Login failed: " + error, Toast.LENGTH_LONG).show();
                         }
                     }
                 });

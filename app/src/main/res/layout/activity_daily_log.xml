@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Daily Log"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Symptoms Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Symptoms (Select all that apply)"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"/>
+
+        <CheckBox android:id="@+id/cb_cough" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cough"/>
+        <CheckBox android:id="@+id/cb_wheezing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wheezing"/>
+        <CheckBox android:id="@+id/cb_shortness" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Shortness of Breath"/>
+        <CheckBox android:id="@+id/cb_chest" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Chest Tightness"/>
+
+        <!-- Triggers Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Triggers (Select all that apply)"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
+        <CheckBox android:id="@+id/cb_dust" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dust"/>
+        <CheckBox android:id="@+id/cb_pollen" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pollen"/>
+        <CheckBox android:id="@+id/cb_smoke" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Smoke"/>
+        <CheckBox android:id="@+id/cb_exercise" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Exercise"/>
+
+        <!-- Severity Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Overall Severity (1-10)"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
+        <SeekBar
+            android:id="@+id/severity_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progress="5"/>
+
+        <TextView
+            android:id="@+id/severity_value_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Level: 5"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Notes Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notes"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/notes_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Any additional details..."
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top"/>
+
+        <Button
+            android:id="@+id/save_log_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Log"
+            android:textColor="#000000"
+            android:layout_marginTop="24dp"/>
+
+    </LinearLayout>
+</ScrollView>
