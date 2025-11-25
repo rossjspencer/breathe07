@@ -25,11 +25,32 @@
             android:textSize="18sp"
             android:layout_marginBottom="8dp"/>
 
-        <CheckBox android:id="@+id/cb_cough" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cough"/>
+        <CheckBox
+            android:id="@+id/cb_cough"
+            android:layout_width="84dp"
+            android:layout_height="wrap_content"
+            android:text="Cough" />
         <CheckBox android:id="@+id/cb_wheezing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wheezing"/>
         <CheckBox android:id="@+id/cb_shortness" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Shortness of Breath"/>
         <CheckBox android:id="@+id/cb_chest" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Chest Tightness"/>
-
+        <CheckBox android:id="@+id/cb_night_waking" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Night Waking"/>
+        <!-- Activity Limitation Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activity Limitation"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+        <RadioGroup
+            android:id="@+id/rg_activity_limitation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/rb_mild" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mild" android:layout_marginEnd="16dp"/>
+            <RadioButton android:id="@+id/rb_moderate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Moderate" android:layout_marginEnd="16dp"/>
+            <RadioButton android:id="@+id/rb_severe" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Severe"/>
+        </RadioGroup>
         <!-- Triggers Section -->
         <TextView
             android:layout_width="wrap_content"
@@ -43,6 +64,10 @@
         <CheckBox android:id="@+id/cb_pollen" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pollen"/>
         <CheckBox android:id="@+id/cb_smoke" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Smoke"/>
         <CheckBox android:id="@+id/cb_exercise" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Exercise"/>
+        <CheckBox android:id="@+id/cb_pets" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pets"/>
+        <CheckBox android:id="@+id/cb_cold_air" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cold air"/>
+        <CheckBox android:id="@+id/cb_illness" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Illness"/>
+        <CheckBox android:id="@+id/cb_pcs" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Perfumes/Cleaners/Strong Odors"/>
 
         <!-- Severity Section -->
         <TextView

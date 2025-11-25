@@ -7,17 +7,19 @@ public class SymptomLog {
     public List<String> symptoms;
     public List<String> triggers;
     public int severity;
+    public String activityLimitation;
     public String notes;
 
     public SymptomLog() {
         // Required empty constructor for Firebase
     }
 
-    public SymptomLog(long timestamp, List<String> symptoms, List<String> triggers, int severity, String notes) {
+    public SymptomLog(long timestamp, List<String> symptoms, List<String> triggers, int severity, String activityLimitation, String notes) {
         this.timestamp = timestamp;
         this.symptoms = symptoms;
         this.triggers = triggers;
         this.severity = severity;
+        this.activityLimitation = activityLimitation;
         this.notes = notes;
     }
 }
