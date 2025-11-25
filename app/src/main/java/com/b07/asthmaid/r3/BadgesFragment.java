@@ -1,5 +1,7 @@
 package com.b07.asthmaid.r3;
 
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,10 +35,26 @@ public class BadgesFragment extends Fragment {
         
         LinearLayout badge1Layout = view.findViewById(R.id.badge1Layout);
         ImageView badge1Image = view.findViewById(R.id.badge1Image);
+        ImageView badge1Lock = view.findViewById(R.id.badge1Lock);
+
+        LinearLayout badge2Layout = view.findViewById(R.id.badge2Layout);
+        ImageView badge2Image = view.findViewById(R.id.badge2Image);
+        ImageView badge2Lock = view.findViewById(R.id.badge2Lock);
+
+        LinearLayout badge3Layout = view.findViewById(R.id.badge3Layout);
+        ImageView badge3Image = view.findViewById(R.id.badge3Image);
+        ImageView badge3Lock = view.findViewById(R.id.badge3Lock);
 
         statsRef = FirebaseDatabase.getInstance().getReference("guide_stats").child(TEMP_USER_ID);
 
-        checkBadgeStatus(badge1Layout, badge1Image);
+        // badges should be grayscale by default
+        applyGrayscale(badge1Image);
+        applyGrayscale(badge2Image);
+        applyGrayscale(badge3Image);
+
+        checkBadgeStatus(badge1Layout, badge1Image, badge1Lock,
+                badge2Layout, badge2Image, badge2Lock,
+                badge3Layout, badge3Image, badge3Lock);
 
         backButton.setOnClickListener(v -> {
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
@@ -47,17 +65,28 @@ public class BadgesFragment extends Fragment {
         return view;
     }
 
-    private void checkBadgeStatus(LinearLayout badgeLayout, ImageView badgeImage) {
+    private void applyGrayscale(ImageView imageView) {
+        ColorMatrix matrix = new ColorMatrix();
+        matrix.setSaturation(0);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+        imageView.setColorFilter(filter);
+    }
+
+    private void checkBadgeStatus(LinearLayout b1Layout, ImageView b1Image, ImageView b1Lock,
+                                  LinearLayout b2Layout, ImageView b2Image, ImageView b2Lock,
+                                  LinearLayout b3Layout, ImageView b3Image, ImageView b3Lock) {
+        
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GuideStats stats = snapshot.getValue(GuideStats.class);
+                
+                // badge 1 check
                 if (stats != null && stats.totalSessions >= 10) {
-                    // unlock badge
-                    badgeLayout.setAlpha(1.0f);
-                    badgeImage.setImageResource(android.R.drawable.star_big_on);
-                    badgeImage.setBackgroundColor(0); // get rid of background
+                    unlockBadge(b1Layout, b1Image, b1Lock, R.drawable.badge_ten_sessions);
                 }
+
+                // badge 2 and 3 stuff goes here
             }
 
             @Override
@@ -65,5 +94,13 @@ public class BadgesFragment extends Fragment {
                 System.out.println("Why does this keep happening!?!?");
             }
         });
+    }
+
+    private void unlockBadge(LinearLayout layout, ImageView image, ImageView lock, int drawableId) {
+        layout.setAlpha(1.0f);
+        image.clearColorFilter(); 
+        image.setImageResource(drawableId);
+        image.setBackgroundColor(0); 
+        lock.setVisibility(View.GONE);
     }
 }
