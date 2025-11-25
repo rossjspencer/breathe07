@@ -1,0 +1,141 @@
+package com.b07.asthmaid.r3;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.b07.asthmaid.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import nl.dionsegijn.konfetti.core.Party;
+import nl.dionsegijn.konfetti.core.PartyFactory;
+import nl.dionsegijn.konfetti.core.emitter.Emitter;
+import nl.dionsegijn.konfetti.xml.KonfettiView;
+
+public class InhalerFinishFragment extends Fragment {
+
+    // Use same temp user ID as other fragments
+    private static final String TEMP_USER_ID = "testUserId";
+    private DatabaseReference statsRef;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_inhaler_finish, container, false);
+
+        KonfettiView konfettiView = view.findViewById(R.id.konfettiView);
+        Button homeButton = view.findViewById(R.id.finishHomeButton);
+        TextView statsText = view.findViewById(R.id.statsText);
+
+        statsRef = FirebaseDatabase.getInstance().getReference("guide_stats").child(TEMP_USER_ID);
+
+        updateStats(statsText);
+
+        Party party = new PartyFactory(new Emitter(100L, TimeUnit.MILLISECONDS).max(100))
+                .spread(360)
+                .colors(Arrays.asList(0xfce18a, 0xff726d, 0xf4306d, 0xb48def))
+                .setSpeedBetween(0f, 30f)
+                .position(0.5, 0.3)
+                .build();
+
+        konfettiView.start(party);
+
+        homeButton.setOnClickListener(v -> {
+            // Return to home screen
+            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                // Clear back stack to go back to HomeFragment
+                getParentFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
+        });
+
+        return view;
+    }
+
+    private void updateStats(TextView statsText) {
+        statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GuideStats stats = snapshot.getValue(GuideStats.class);
+                if (stats == null) {
+                    stats = new GuideStats(0, 0, "");
+                }
+
+                String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                
+                boolean sessionCountedToday = today.equals(stats.lastSessionDate);
+                
+                if (!sessionCountedToday) {
+                    stats.totalSessions++;
+
+                    // Check streak
+                    if (isConsecutiveDay(stats.lastSessionDate, today)) {
+                        stats.streakDays++;
+                    } else if (!today.equals(stats.lastSessionDate)) {
+                        // Reset streak if missed a day (and it's not just the same day)
+                        // Note: If it's the first ever session, streak becomes 1.
+                        stats.streakDays = 1;
+                    }
+                    
+                    stats.lastSessionDate = today;
+                    statsRef.setValue(stats);
+                } else {
+                    // Optionally increment totalSessions even if same day? 
+                    // "number of days in a row where a technique session was completed" implies streak is daily.
+                    // "total number of times a user completed" implies just a counter.
+                    // Let's increment totalSessions regardless of day, but only update streak once per day.
+                    
+                    // Re-fetch to avoid race conditions in a real app, but here we just increment locally
+                    stats.totalSessions++;
+                    statsRef.setValue(stats);
+                }
+                
+                if (getContext() != null) {
+                    String text = "Total Sessions: " + stats.totalSessions + "\n" +
+                            "Day Streak: " + stats.streakDays + " 🔥";
+                    statsText.setText(text);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle error
+            }
+        });
+    }
+
+    private boolean isConsecutiveDay(String lastDateStr, String todayStr) {
+        if (lastDateStr == null || lastDateStr.isEmpty()) return false;
+        
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date lastDate = sdf.parse(lastDateStr);
+            Date today = sdf.parse(todayStr);
+            
+            if (lastDate == null || today == null) return false;
+
+            long diff = today.getTime() - lastDate.getTime();
+            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            
+            return days == 1;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}

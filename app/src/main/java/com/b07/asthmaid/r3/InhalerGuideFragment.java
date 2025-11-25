@@ -1,4 +1,4 @@
-package com.b07.asthmaid;
+package com.b07.asthmaid.r3;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.b07.asthmaid.R;
 
 public class InhalerGuideFragment extends Fragment {
 
