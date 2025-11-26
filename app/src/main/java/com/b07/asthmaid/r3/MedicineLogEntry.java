@@ -1,6 +1,7 @@
 package com.b07.asthmaid.r3;
 
 public abstract class MedicineLogEntry {
+    public String name;
     public int doseCount;
     public String timestamp;
     public String id;
@@ -8,7 +9,8 @@ public abstract class MedicineLogEntry {
     // firebase constructor
     public MedicineLogEntry(){};
 
-    public MedicineLogEntry(int doseCount, String timestamp) {
+    public MedicineLogEntry(String name, int doseCount, String timestamp) {
+        this.name = name;
         this.doseCount = doseCount;
         this.timestamp = timestamp;
     }

@@ -46,13 +46,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="% Left" />
+            android:text="Dose Capacity (Total Doses)" />
 
         <EditText
-            android:id="@+id/editPercentLeft"
+            android:id="@+id/editDoseCapacity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Remaining Doses (Optional)" />
+
+        <EditText
+            android:id="@+id/editRemainingDoses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Defaults to Capacity if empty"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -77,31 +90,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Rescue" />
-        </RadioGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Marked by" />
-
-        <RadioGroup
-            android:id="@+id/radioWhoGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radioParent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Parent" />
-
-            <RadioButton
-                android:id="@+id/radioChild"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Child" />
         </RadioGroup>
 
     </LinearLayout>

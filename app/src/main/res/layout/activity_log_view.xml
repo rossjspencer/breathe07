@@ -8,6 +8,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
@@ -51,6 +64,15 @@
         android:paddingBottom="4dp">
 
         <TextView
+            android:id="@+id/headerName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:text="Name"
+            android:textStyle="bold"
+            android:gravity="start" />
+
+        <TextView
             android:id="@+id/headerTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -66,18 +88,9 @@
             android:layout_weight="1"
             android:text="Dose"
             android:textStyle="bold"
+            android:paddingStart="30dp"
             android:gravity="start" />
 
-        <TextView
-            android:id="@+id/headerType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Type"
-            android:textStyle="bold"
-            android:gravity="start" />
-
-        <!-- aligns headers with delete button -->
         <View
             android:layout_width="24dp"
             android:layout_height="24dp" />

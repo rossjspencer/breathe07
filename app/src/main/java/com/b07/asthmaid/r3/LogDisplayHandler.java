@@ -54,28 +54,21 @@ public class LogDisplayHandler extends RecyclerView.Adapter<LogDisplayHandler.Vi
 
         TextView timestampView;
         TextView doseView;
-        TextView typeView;
+        TextView nameView;
         ImageButton deleteButton;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             timestampView = itemView.findViewById(R.id.tvTimestamp);
             doseView = itemView.findViewById(R.id.tvDose);
-            typeView = itemView.findViewById(R.id.tvType);
+            nameView = itemView.findViewById(R.id.tvName);
             deleteButton = itemView.findViewById(R.id.btnDelete);
         }
 
         void bind(MedicineLogEntry entry) {
             timestampView.setText(entry.timestamp);
             doseView.setText(String.valueOf(entry.doseCount));
-
-            if (entry instanceof ControllerLogEntry) {
-                typeView.setText("Controller");
-            } else if (entry instanceof RescueLogEntry) {
-                typeView.setText("Rescue");
-            } else {
-                typeView.setText("Unknown");
-            }
+            nameView.setText(entry.name);
 
             deleteButton.setOnClickListener(v -> {
                 fragment.showDeleteConfirmDialog(entry);

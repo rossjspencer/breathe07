@@ -116,7 +116,7 @@ public class InventoryFragment extends Fragment {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Inventory Alerts";
-            String description = "Notifications for low or expired medication";
+            String description = "Notifications for low, empty, or expired medication";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -169,7 +169,9 @@ public class InventoryFragment extends Fragment {
         int notificationId = 1;
 
         for (InventoryItem item : controllerItems) {
-            if (item.isLow()) {
+            if (item.percentLeft <= 0) {
+                sendNotification(notificationId++, "Empty Medication Warning", "Controller medication " + item.name + " is empty!");
+            } else if (item.isLow()) {
                 sendNotification(notificationId++, "Low Medication Warning", "Controller medication " + item.name + " is running low (" + item.percentLeft + "% left).");
             }
             if (item.isExpired()) {
@@ -177,7 +179,9 @@ public class InventoryFragment extends Fragment {
             }
         }
         for (InventoryItem item : rescueItems) {
-            if (item.isLow()) {
+            if (item.percentLeft <= 0) {
+                sendNotification(notificationId++, "Empty Medication Warning", "Rescue medication " + item.name + " is empty!");
+            } else if (item.isLow()) {
                 sendNotification(notificationId++, "Low Medication Warning", "Rescue medication " + item.name + " is running low (" + item.percentLeft + "% left).");
             }
             if (item.isExpired()) {
@@ -218,20 +222,17 @@ public class InventoryFragment extends Fragment {
         EditText nameEdit = dialogView.findViewById(R.id.editInventoryName);
         EditText purchaseEdit = dialogView.findViewById(R.id.editPurchaseDate);
         EditText expiryEdit = dialogView.findViewById(R.id.editExpiryDate);
-        EditText percentEdit = dialogView.findViewById(R.id.editPercentLeft);
+        EditText capacityEdit = dialogView.findViewById(R.id.editDoseCapacity);
+        EditText remainingEdit = dialogView.findViewById(R.id.editRemainingDoses);
         RadioGroup typeGroup = dialogView.findViewById(R.id.radioInventoryTypeGroup);
         RadioButton controllerRadio = dialogView.findViewById(R.id.radioInventoryController);
         RadioButton rescueRadio = dialogView.findViewById(R.id.radioInventoryRescue);
-        RadioGroup whoGroup = dialogView.findViewById(R.id.radioWhoGroup);
-        RadioButton parentRadio = dialogView.findViewById(R.id.radioParent);
-        RadioButton childRadio = dialogView.findViewById(R.id.radioChild);
 
         if (currentType == InventoryType.CONTROLLER) {
             controllerRadio.setChecked(true);
         } else {
             rescueRadio.setChecked(true);
         }
-        parentRadio.setChecked(true);
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Add Inventory Item")
@@ -240,32 +241,43 @@ public class InventoryFragment extends Fragment {
                     String name = nameEdit.getText().toString().trim();
                     String purchase = purchaseEdit.getText().toString().trim();
                     String expiry = expiryEdit.getText().toString().trim();
-                    String percentStr = percentEdit.getText().toString().trim();
+                    String capacityStr = capacityEdit.getText().toString().trim();
+                    String remainingStr = remainingEdit.getText().toString().trim();
 
-                    if (TextUtils.isEmpty(name) || TextUtils.isEmpty(percentStr)) {
+                    if (TextUtils.isEmpty(name) || TextUtils.isEmpty(capacityStr)) {
+                        Toast.makeText(getContext(), "Name and Capacity are required",
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    int percent;
+                    int capacity;
                     try {
-                        percent = Integer.parseInt(percentStr);
+                        capacity = Integer.parseInt(capacityStr);
                     } catch (NumberFormatException e) {
                         return;
                     }
 
+                    int remaining;
+                    if (TextUtils.isEmpty(remainingStr)) {
+                        remaining = capacity;
+                    } else {
+                        try {
+                            remaining = Integer.parseInt(remainingStr);
+                        } catch (NumberFormatException e) {
+                            return;
+                        }
+                    }
+
                     String type = (typeGroup.getCheckedRadioButtonId()
                             == R.id.radioInventoryRescue) ? "rescue" : "controller";
-
-                    String who = (whoGroup.getCheckedRadioButtonId()
-                            == R.id.radioChild) ? "child" : "parent";
 
                     InventoryItem item = new InventoryItem(
                             name,
                             type,
                             purchase,
                             expiry,
-                            percent,
-                            who
+                            capacity,
+                            remaining
                     );
 
                     saveItemToFirebase(item);

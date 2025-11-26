@@ -6,8 +6,8 @@ public class RescueLogEntry extends MedicineLogEntry {
         super();
     }
 
-    public RescueLogEntry(int doseCount, String timestamp) {
-        super(doseCount, timestamp);
+    public RescueLogEntry(String name, int doseCount, String timestamp) {
+        super(name, doseCount, timestamp);
     }
 
     @Override

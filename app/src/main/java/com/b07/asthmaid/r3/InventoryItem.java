@@ -8,19 +8,30 @@ public class InventoryItem {
     public String purchaseDate;
     public String expiryDate;
     public int percentLeft;
-    public String lastUpdatedBy; // maybe not needed? ask group
+    public int doseCapacity;
+    public int remainingDoses; // set to doseCapacity if not explicitly given
 
     public InventoryItem() { } // firebase constructor
 
     public InventoryItem(String name, String type,
                          String purchaseDate, String expiryDate,
-                         int percentLeft, String lastUpdatedBy) {
+                         int doseCapacity, int remainingDoses) {
         this.name = name;
         this.type = type;
         this.purchaseDate = purchaseDate;
         this.expiryDate = expiryDate;
-        this.percentLeft = percentLeft;
-        this.lastUpdatedBy = lastUpdatedBy;
+        this.doseCapacity = doseCapacity;
+        this.remainingDoses = remainingDoses;
+        
+        updatePercentLeft();
+    }
+    
+    public void updatePercentLeft() {
+        if (doseCapacity > 0) {
+            this.percentLeft = (int) (((double) remainingDoses / doseCapacity) * 100);
+        } else {
+            this.percentLeft = 0;
+        }
     }
 
     public boolean isLow() {

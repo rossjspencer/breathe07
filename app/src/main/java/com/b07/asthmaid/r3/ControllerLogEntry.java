@@ -6,8 +6,8 @@ public class ControllerLogEntry extends MedicineLogEntry {
         super();
     }
 
-    public ControllerLogEntry(int doseCount, String timestamp){
-        super(doseCount, timestamp);
+    public ControllerLogEntry(String name, int doseCount, String timestamp){
+        super(name, doseCount, timestamp);
     }
 
     @Override
