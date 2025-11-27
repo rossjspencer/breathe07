@@ -14,6 +14,11 @@ public class User {
 
     public String password;
     public String role;
+
+    // ⭐ From your branch (keep this — important for onboarding flow)
+    public boolean onboardingComplete = false;
+
+    // ⭐ From main branch — keep all additional fields
     public String dateOfBirth;
     public String notes;
 
@@ -24,6 +29,7 @@ public class User {
     // Sharing Settings Node (nested object)
     public Map<String, Boolean> sharingSettings = new HashMap<>();
 
+    // Required empty constructor for Firebase
     public User() {}
 
     // Updated constructor to handle generic creation
@@ -31,5 +37,9 @@ public class User {
         this.userId = userId;
         this.role = role;
         this.email = email;
+
+        // Your feature preserved: new users start with onboarding incomplete
+        this.onboardingComplete = false;
     }
 }
+
