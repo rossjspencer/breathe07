@@ -1,26 +1,33 @@
 package com.example.smartair;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.ArrayAdapter;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.AuthResult;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.*;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText emailField, passwordField;
+    private EditText etFirst, etLast, etProviderName, etEmail, etPass;
+    private LinearLayout layoutNames;
     private Spinner roleSpinner;
-    private Button registerBtn;
+    private Button btnRegister;
     private FirebaseAuth auth;
+    private DatabaseReference db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,75 +35,142 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         auth = FirebaseAuth.getInstance();
+        db = FirebaseDatabase.getInstance().getReference("users");
 
-        emailField = findViewById(R.id.email_edittext);
-        passwordField = findViewById(R.id.password_edittext);
+        bindViews();
+        setupSpinner();
+
+        btnRegister.setOnClickListener(v -> checkInputs());
+    }
+
+    private void bindViews() {
+        etFirst = findViewById(R.id.firstname_edittext);
+        etLast = findViewById(R.id.lastname_edittext);
+        etProviderName = findViewById(R.id.providername_edittext);
+        etEmail = findViewById(R.id.email_edittext);
+        etPass = findViewById(R.id.password_edittext);
+        layoutNames = findViewById(R.id.layout_names);
         roleSpinner = findViewById(R.id.role_spinner);
-        registerBtn = findViewById(R.id.register_button);
+        btnRegister = findViewById(R.id.register_button);
+    }
 
+    private void setupSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.roles_array,
-                android.R.layout.simple_spinner_item
+                this, R.array.roles_array, android.R.layout.simple_spinner_item
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roleSpinner.setAdapter(adapter);
 
-        registerBtn.setOnClickListener(v -> registerUser());
+        roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String role = parent.getItemAtPosition(position).toString();
+                if (role.equals("Provider")) {
+                    layoutNames.setVisibility(View.GONE);
+                    etProviderName.setVisibility(View.VISIBLE);
+                } else {
+                    layoutNames.setVisibility(View.VISIBLE);
+                    etProviderName.setVisibility(View.GONE);
+                }
+            }
+
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
-    private void registerUser() {
-        String email = emailField.getText().toString().trim();
-        String password = passwordField.getText().toString().trim();
+    private void checkInputs() {
         String role = roleSpinner.getSelectedItem().toString();
+        String email = etEmail.getText().toString().trim();
+        String pass = etPass.getText().toString().trim();
 
-        // Empty fields
-        if (email.isEmpty() || password.isEmpty()) {
-            AuthHelper.showToast(this, "Please fill out all fields");
+        //VALIDATION (From My branch)
+        if (email.isEmpty() || pass.isEmpty()) {
+            Toast.makeText(this, "Email/Password required", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // VALID EMAIL FORMAT
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            AuthHelper.showToast(this, "Invalid email format");
+            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // STRONG PASSWORD RULE
         String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$";
-
-        if (!password.matches(passwordPattern)) {
-            AuthHelper.showToast(
+        if (!pass.matches(passwordPattern)) {
+            Toast.makeText(
                     this,
-                    "Password must be 8+ characters, include upper, lower and number"
-            );
+                    "Password must be 8+ characters, include upper, lower and number",
+                    Toast.LENGTH_LONG
+            ).show();
             return;
         }
 
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
+        // Provider registration flow
+        if (role.equals("Provider")) {
+            String pName = etProviderName.getText().toString().trim();
+
+            if (pName.isEmpty()) {
+                Toast.makeText(this, "Provider Name required", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // CHECK UNIQUENESS
+            db.orderByChild("providerName").equalTo(pName)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                Toast.makeText(RegisterActivity.this,
+                                        "Provider Name already taken", Toast.LENGTH_SHORT).show();
+                            } else {
+                                registerUser(role, email, pass, null, null, pName);
+                            }
+                        }
+
+                        @Override public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+
+        } else { // Parent registration flow
+            String first = etFirst.getText().toString().trim();
+            String last = etLast.getText().toString().trim();
+
+            if (first.isEmpty() || last.isEmpty()) {
+                Toast.makeText(this, "Names required", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            registerUser(role, email, pass, first, last, null);
+        }
+    }
+
+    private void registerUser(String role, String email, String pass,
+                              String first, String last, String pName) {
+
+        auth.createUserWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(task -> {
 
                     if (!task.isSuccessful()) {
-                        AuthHelper.showToast(this, "Registration failed");
+                        Toast.makeText(this,
+                                "Error: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
                         return;
                     }
 
-                    // Save user in database
                     String uid = task.getResult().getUser().getUid();
-                    User user = new User(email, role);
+                    User user = new User(uid, role, email);
 
-                    DatabaseReference ref = AuthHelper.getUserRef(uid);
+                    if (role.equals("Provider")) {
+                        user.providerName = pName;
+                    } else {
+                        user.firstName = first;
+                        user.lastName = last;
+                    }
 
-                    ref.setValue(user).addOnCompleteListener(dbTask -> {
-                        if (dbTask.isSuccessful()) {
-                            AuthHelper.showToast(this, "Registration successful!");
-                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
-                            finish();
-                        } else {
-                            AuthHelper.showToast(this, "Database error");
-                        }
+                    db.child(uid).setValue(user).addOnSuccessListener(v -> {
+                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                        finish();
                     });
                 });
     }
 }
+
 

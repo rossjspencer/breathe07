@@ -15,6 +15,12 @@
 
         <activity android:name=".ParentOnboardingActivity" />
         <activity android:name=".ProviderOnboardingActivity" />
+        <activity android:name=".ShareProviderActivity" android:exported="false" />
+        <activity android:name=".InviteProviderActivity" android:exported="false" />
+        <activity android:name=".ManageChildActivity" android:exported="false" />
+        <activity android:name=".ChildHomeActivity" />
+        <activity android:name=".AddChildActivity" android:exported="false" />
+        <activity android:name=".ProviderViewPatientActivity" android:exported="false" />
         <activity android:name=".ParentHomeActivity" />
         <activity android:name=".ProviderHomeActivity" />
         <activity android:name=".LoginActivity" android:exported="false" />
