@@ -29,7 +29,11 @@ public class User {
     // Sharing Settings Node (nested object)
     public Map<String, Boolean> sharingSettings = new HashMap<>();
 
-    // Required empty constructor for Firebase
+    // R6: Planner & adherence helpers
+    public int plannedControllerPerDay = 1; // number of doses expected per day
+    public int plannedControllerDaysPerWeek = 7; // how many days each week the plan expects
+    public long lastRescueTimestamp = 0; // cached for quick dashboard tile lookup
+
     public User() {}
 
     // Updated constructor to handle generic creation

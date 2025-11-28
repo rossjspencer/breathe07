@@ -105,6 +105,15 @@ app:cardElevation="4dp">
                 android:backgroundTint="#757575"
                 android:layout_marginStart="4dp"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnViewDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="8dp"
+            android:text="Parent Dashboard"
+            android:textSize="12sp"
+            android:backgroundTint="#2E7D32" />
     </LinearLayout>
 
 </LinearLayout>

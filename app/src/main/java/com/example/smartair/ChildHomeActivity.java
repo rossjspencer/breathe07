@@ -114,8 +114,16 @@ public class ChildHomeActivity extends AppCompatActivity {
         int asthmaScore = (int) (((float) currentPef / personalBest) * 100);
         if (asthmaScore > 100) asthmaScore = 100;
 
+        final int finalScore = asthmaScore;
         mDatabase.child("users").child(currentChildId).child("asthmaScore").setValue(asthmaScore)
-                .addOnSuccessListener(v -> Toast.makeText(this, "Logged successfully!", Toast.LENGTH_SHORT).show())
+                .addOnSuccessListener(v -> {
+                    // Log to history for provider reports and zone-change tracking
+                    long now = System.currentTimeMillis();
+                    ZoneEntry entry = new ZoneEntry(now, finalScore);
+                    mDatabase.child("users").child(currentChildId).child("zoneHistory").push()
+                            .setValue(entry);
+                    Toast.makeText(this, "Logged successfully!", Toast.LENGTH_SHORT).show();
+                })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }
