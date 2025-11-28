@@ -22,6 +22,7 @@
         <activity android:name=".AddChildActivity" android:exported="false" />
         <activity android:name=".ProviderViewPatientActivity" android:exported="false" />
         <activity android:name=".ParentHomeActivity" />
+        <activity android:name=".ParentViewChildActivity" android:exported="false" />
         <activity android:name=".ProviderHomeActivity" />
         <activity android:name=".LoginActivity" android:exported="false" />
         <activity android:name=".RegisterActivity" android:exported="false" />

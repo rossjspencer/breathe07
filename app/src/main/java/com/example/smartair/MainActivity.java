@@ -15,15 +15,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        // OPTION A: stay logged in & skip main if already authenticated
-        if (currentUser != null) {
-            // Use the same logic as after login
-            AuthHelper.handlePostAuth(this, currentUser.getUid());
-            return; // important: don't show main layout
-        }
-
+        // Always show the login/register screen; no auto-redirect
         setContentView(R.layout.activity_main);
 
         Button loginBtn = findViewById(R.id.login_button_main);
