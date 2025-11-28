@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.b07.asthmaid.r3.ControllerLogEntry;
+import com.b07.asthmaid.r3.InhalerPostCheckFragment;
 import com.b07.asthmaid.r3.InventoryItem;
 import com.b07.asthmaid.r3.RescueLogEntry;
 import com.google.firebase.database.DataSnapshot;
@@ -59,21 +60,18 @@ public class InhalerLogPromptFragment extends Fragment {
         Button skipButton = view.findViewById(R.id.logSkipButton);
         Button okButton = view.findViewById(R.id.logOkButton);
 
-        skipButton.setOnClickListener(v -> navigateToFeedback());
+        skipButton.setOnClickListener(v -> navigateToPostCheck());
         okButton.setOnClickListener(v -> showAddLogDialog());
 
         return view;
     }
 
-    private void navigateToFeedback() {
+    private void navigateToPostCheck() {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                 android.R.anim.fade_in, android.R.anim.fade_out);
         
-        InhalerFeedbackFragment fragment = new InhalerFeedbackFragment();
-        Bundle args = new Bundle();
-        args.putBoolean("success", success);
-        fragment.setArguments(args);
+        InhalerPostCheckFragment fragment = new InhalerPostCheckFragment();
         
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
@@ -93,13 +91,10 @@ public class InhalerLogPromptFragment extends Fragment {
         RadioButton radioRescue = dialogView.findViewById(R.id.radioRescue);
         Button btnCantFindInhaler = dialogView.findViewById(R.id.btnCantFindInhaler);
 
-        // populate spinner initially based on controller (default)
         updateSpinner(spinnerInhalerName, LogType.CONTROLLER);
 
-        // pre-select type
         radioController.setChecked(true);
 
-        // update spinner when type changes
         typeGroup.setOnCheckedChangeListener((group, checkedId) -> {
             LogType selectedType = (checkedId == R.id.radioController) ? LogType.CONTROLLER : LogType.RESCUE;
             updateSpinner(spinnerInhalerName, selectedType);
@@ -121,7 +116,7 @@ public class InhalerLogPromptFragment extends Fragment {
                     String selectedInhaler = null;
                     if (spinnerInhalerName.getSelectedItem() != null) {
                         String selection = spinnerInhalerName.getSelectedItem().toString();
-                        // Check if it's the empty placeholder
+                        // check if it's the empty placeholder
                         if (!selection.equals("No inhalers of this type in Inventory.")) {
                             selectedInhaler = selection;
                         }
@@ -177,7 +172,7 @@ public class InhalerLogPromptFragment extends Fragment {
 
                         //path can be changed
                         DatabaseReference typeRef = logReference.child("rescue")
-                                .child(TEMP_ID);  // hardcoded for testing;
+                                .child(TEMP_ID);  // hardcoded for testing
                         String key = typeRef.push().getKey();
                         entry.id = key;
                         if (key != null) {
@@ -186,9 +181,8 @@ public class InhalerLogPromptFragment extends Fragment {
                         
                         updateInventoryDose(selectedInhaler, dose, "rescue");
                     }
-                    
-                    // After saving, proceed to the feedback screen
-                    navigateToFeedback();
+
+                    navigateToPostCheck();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -241,7 +235,7 @@ public class InhalerLogPromptFragment extends Fragment {
                         // recalculate percentage
                         item.updatePercentLeft();
 
-                        // update Firebase
+                        // update firebase
                         child.getRef().setValue(item);
                     }
                 }

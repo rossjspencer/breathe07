@@ -1,192 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp">
-
-        <Button
-            android:id="@+id/badgesBackButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Awards"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="8dp" />
-
-    <TextView
-        android:id="@+id/textCurrentStreak"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Current Streak: 0 Days 🔥"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textColor="#FF5722"
-        android:layout_marginBottom="24dp" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
 
-            <LinearLayout
-                android:id="@+id/badge1Layout"
+            <Button
+                android:id="@+id/badgesBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:layout_marginBottom="32dp">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/badge1Image"
-                        android:layout_width="240dp"
-                        android:layout_height="240dp"
-                        android:src="@drawable/badge_ten_sessions" />
-
-                    <ImageView
-                        android:id="@+id/badge1Lock"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_gravity="center"
-                        android:src="@android:drawable/ic_lock_lock"
-                        android:tint="#FFD700" />
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/badge1Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Diaphragm Decathlon"
-                    android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:layout_marginTop="12dp"/>
-
-                <TextView
-                    android:id="@+id/badge1Desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Complete 10 High-Quality Doses"
-                    android:textSize="18sp"
-                    android:gravity="center"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/badge2Layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:layout_marginBottom="32dp">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/badge2Image"
-                        android:layout_width="240dp"
-                        android:layout_height="240dp"
-                        android:src="@drawable/badge_perfect_week" />
-
-                    <ImageView
-                        android:id="@+id/badge2Lock"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_gravity="center"
-                        android:src="@android:drawable/ic_lock_lock"
-                        android:tint="#FFD700" />
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/badge2Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Placeholder"
-                    android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:layout_marginTop="12dp"/>
-
-                <TextView
-                    android:id="@+id/badge2Desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Placeholder"
-                    android:textSize="18sp"
-                    android:gravity="center"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/badge3Layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:layout_marginBottom="32dp">
-
-                 <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/badge3Image"
-                        android:layout_width="240dp"
-                        android:layout_height="240dp"
-                        android:src="@drawable/badge_low_rescue_month" />
-
-                    <ImageView
-                        android:id="@+id/badge3Lock"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_gravity="center"
-                        android:src="@android:drawable/ic_lock_lock"
-                        android:tint="#FFD700" />
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/badge3Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Well Controlled"
-                    android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:layout_marginTop="12dp"/>
-
-                <TextView
-                    android:id="@+id/badge3Desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="4 or fewer Rescue uses in 30 days"
-                    android:textSize="18sp"
-                    android:gravity="center"/>
-            </LinearLayout>
-
+                android:text="Back" />
         </LinearLayout>
-    </ScrollView>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Awards"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/textCurrentStreak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Current Streak: 0 Days 🔥"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="#FF5722"
+            android:layout_marginBottom="24dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/badge1Layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:layout_marginBottom="32dp">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/badge1Image"
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            android:src="@drawable/badge_ten_sessions" />
+
+                        <ImageView
+                            android:id="@+id/badge1Lock"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_lock_lock"
+                            android:tint="#FFD700" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/badge1Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Diaphragm Decathlon"
+                        android:textStyle="bold"
+                        android:textSize="24sp"
+                        android:layout_marginTop="12dp"/>
+
+                    <TextView
+                        android:id="@+id/badge1Desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Complete 10 Technique Sessions"
+                        android:textSize="18sp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/badge2Layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:layout_marginBottom="32dp">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/badge2Image"
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            android:src="@drawable/badge_perfect_week" />
+
+                        <ImageView
+                            android:id="@+id/badge2Lock"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_lock_lock"
+                            android:tint="#FFD700" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/badge2Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Placeholder"
+                        android:textStyle="bold"
+                        android:textSize="24sp"
+                        android:layout_marginTop="12dp"/>
+
+                    <TextView
+                        android:id="@+id/badge2Desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Placeholder"
+                        android:textSize="18sp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/badge3Layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:layout_marginBottom="32dp">
+
+                     <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/badge3Image"
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            android:src="@drawable/badge_low_rescue_month" />
+
+                        <ImageView
+                            android:id="@+id/badge3Lock"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_lock_lock"
+                            android:tint="#FFD700" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/badge3Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Well Controlled"
+                        android:textStyle="bold"
+                        android:textSize="24sp"
+                        android:layout_marginTop="12dp"/>
+
+                    <TextView
+                        android:id="@+id/badge3Desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&lt; 4 Rescue uses in 30 days"
+                        android:textSize="18sp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/overlayLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="10dp">
+
+        <nl.dionsegijn.konfetti.xml.KonfettiView
+            android:id="@+id/konfettiViewBadge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/overlayBadgeImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/overlayBadgeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/overlayBadgeImage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+    </RelativeLayout>
+
+</FrameLayout>

@@ -1,5 +1,10 @@
 package com.b07.asthmaid.r3;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +14,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.b07.asthmaid.R;
@@ -31,18 +38,27 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 public class InhalerFinishFragment extends Fragment {
 
-    // use same temp user ID as other fragments
     private static final String TEMP_USER_ID = "testUserId";
+    private static final String BADGE_CHANNEL_ID = "badge_alerts";
+    
     private DatabaseReference statsRef;
+    private boolean wasSuccessful = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_inhaler_finish, container, false);
 
+        createNotificationChannel();
+
+        if (getArguments() != null) {
+            wasSuccessful = getArguments().getBoolean("success", false);
+        }
+
         KonfettiView konfettiView = view.findViewById(R.id.konfettiView);
         Button homeButton = view.findViewById(R.id.finishHomeButton);
         TextView statsText = view.findViewById(R.id.statsText);
+
 
         Party party = new PartyFactory(new Emitter(100L, TimeUnit.MILLISECONDS).max(100))
                 .spread(360)
@@ -57,14 +73,42 @@ public class InhalerFinishFragment extends Fragment {
         updateStats(statsText);
 
         homeButton.setOnClickListener(v -> {
-            // return to home screen
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                // clear back stack to go back to HomeFragment
                 getParentFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
         });
 
         return view;
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Badge Alerts";
+            String description = "Notifications for earned badges";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(BADGE_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void sendBadgeNotification(String badgeName) {
+        if (getContext() == null) return;
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), BADGE_CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setContentTitle("Badge Unlocked!")
+                .setContentText("The " + badgeName + " badge is ready to be unlocked. Go to the awards screen to claim it!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
+        try {
+            notificationManager.notify(badgeName.hashCode(), builder.build());
+        } catch (SecurityException e) {
+            // ignore
+        }
     }
 
     private void updateStats(TextView statsText) {
@@ -76,29 +120,31 @@ public class InhalerFinishFragment extends Fragment {
                     stats = new GuideStats(0, 0, "");
                 }
 
-                // only update counters if session was successful
-                String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                if (wasSuccessful) {
+                    String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
                     
-                boolean sessionCountedToday = today.equals(stats.lastSessionDate);
+                    boolean sessionCountedToday = today.equals(stats.lastSessionDate);
                     
-                if (!sessionCountedToday) {
-                    stats.totalSessions++;
+                    if (!sessionCountedToday) {
+                        stats.totalSessions++;
 
-                    // check streak
-                    if (isConsecutiveDay(stats.lastSessionDate, today)) {
-                        stats.streakDays++;
-                    } else if (!today.equals(stats.lastSessionDate)) {
-                        stats.streakDays = 1;
-                    }
+                        if (isConsecutiveDay(stats.lastSessionDate, today)) {
+                            stats.streakDays++;
+                        } else if (!today.equals(stats.lastSessionDate)) {
+                            stats.streakDays = 1;
+                        }
                         
-                    stats.lastSessionDate = today;
-                    statsRef.setValue(stats);
-                } else {
-                    // increment total sessions even if same day
-                    stats.totalSessions++;
-                    statsRef.setValue(stats);
-                }
+                        stats.lastSessionDate = today;
+                        statsRef.setValue(stats);
+                    } else {
+                        stats.totalSessions++;
+                        statsRef.setValue(stats);
+                    }
 
+                    if (stats.totalSessions >= 10 && !stats.hasBadge("badge_10_sessions")) {
+                        sendBadgeNotification("Diaphragm Decathlon");
+                    }
+                }
                 
                 if (getContext() != null) {
                     String text = "Total Sessions: " + stats.totalSessions + "\n" +

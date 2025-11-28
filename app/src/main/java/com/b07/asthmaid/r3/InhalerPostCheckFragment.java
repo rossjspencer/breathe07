@@ -18,21 +18,19 @@ import com.b07.asthmaid.R;
 
 public class InhalerPostCheckFragment extends Fragment {
 
-    private boolean success;
     private boolean isBreathingSelected = false;
     private boolean isComparisonSelected = false;
+    private boolean isTechniqueSelected = false;
+    private boolean isTechniqueSuccess = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_inhaler_post_check, container, false);
 
-        if (getArguments() != null) {
-            success = getArguments().getBoolean("success", false);
-        }
-
         RadioGroup radioGroupBreathing = view.findViewById(R.id.radioGroupBreathing);
         RadioGroup radioGroupComparison = view.findViewById(R.id.radioGroupComparison);
+        RadioGroup radioGroupTechnique = view.findViewById(R.id.radioGroupTechnique);
         Button nextButton = view.findViewById(R.id.postCheckNextButton);
 
         radioGroupBreathing.setOnCheckedChangeListener((group, checkedId) -> {
@@ -45,12 +43,16 @@ public class InhalerPostCheckFragment extends Fragment {
             checkEnableButton(nextButton);
         });
 
+        radioGroupTechnique.setOnCheckedChangeListener((group, checkedId) -> {
+            isTechniqueSelected = true;
+            isTechniqueSuccess = (checkedId == R.id.radioTechniqueYes);
+            checkEnableButton(nextButton);
+        });
+
         nextButton.setOnClickListener(v -> {
-            if (success) {
-                // navigate to well done screen
+            if (isTechniqueSuccess) {
                 navigateToFinish(true);
             } else {
-                // go back to home
                 if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                     getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
@@ -64,7 +66,7 @@ public class InhalerPostCheckFragment extends Fragment {
     }
 
     private void checkEnableButton(Button button) {
-        button.setEnabled(isBreathingSelected && isComparisonSelected);
+        button.setEnabled(isBreathingSelected && isComparisonSelected && isTechniqueSelected);
     }
 
     private void navigateToFinish(boolean success) {

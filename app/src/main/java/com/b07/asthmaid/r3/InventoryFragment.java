@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,7 +39,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class InventoryFragment extends Fragment {
 
@@ -47,6 +50,8 @@ public class InventoryFragment extends Fragment {
     // replace with real user id obviously
     private static final String TEMP_USER_ID = "testUserId";
     private static final String CHANNEL_ID = "inventory_alerts";
+    private static final String PREFS_NAME = "InventoryAlertPrefs";
+    private static final String KEY_SENT_NOTIFICATIONS = "sent_notifications";
 
     private RecyclerView recyclerView;
     private Button controllerButton;
@@ -91,7 +96,7 @@ public class InventoryFragment extends Fragment {
         controllerButton = view.findViewById(R.id.inventoryControllerButton);
         rescueButton = view.findViewById(R.id.inventoryRescueButton);
         addItemButton = view.findViewById(R.id.inventoryAddButton);
-        //backButton = view.findViewById(R.id.backButton);
+        backButton = view.findViewById(R.id.backButton);
 
         displayHandler = new InventoryDisplayHandler();
         displayHandler.setOnDeleteClickListener(this::showDeleteConfirmDialog);
@@ -176,28 +181,54 @@ public class InventoryFragment extends Fragment {
     }
 
     private void checkAndSendNotifications() {
+        if (getContext() == null) return;
+
+        SharedPreferences prefs = getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> sentNotifications = prefs.getStringSet(KEY_SENT_NOTIFICATIONS, new HashSet<>());
+        Set<String> currentAlerts = new HashSet<>();
+
         int notificationId = 1;
 
-        for (InventoryItem item : controllerItems) {
+        List<InventoryItem> allItems = new ArrayList<>(controllerItems);
+        allItems.addAll(rescueItems);
+
+        for (InventoryItem item : allItems) {
+            if (item.id == null) continue;
+
+            // check empty
             if (item.percentLeft <= 0) {
-                sendNotification(notificationId++, "Empty Medication Warning", "Controller medication " + item.name + " is empty!");
-            } else if (item.isLow()) {
-                sendNotification(notificationId++, "Low Medication Warning", "Controller medication " + item.name + " is running low (" + item.percentLeft + "% left).");
+                String alertKey = item.id + "_empty";
+                currentAlerts.add(alertKey);
+                if (!sentNotifications.contains(alertKey)) {
+                    sendNotification(notificationId++, "Empty Medication Warning", 
+                            (item.type.equals("controller") ? "Controller" : "Rescue") + " medication " + item.name + " is empty!");
+                    sentNotifications.add(alertKey);
+                }
+            } 
+            // check low
+            else if (item.isLow()) {
+                String alertKey = item.id + "_low";
+                currentAlerts.add(alertKey);
+                if (!sentNotifications.contains(alertKey)) {
+                    sendNotification(notificationId++, "Low Medication Warning", 
+                            (item.type.equals("controller") ? "Controller" : "Rescue") + " medication " + item.name + " is running low (" + item.percentLeft + "% left).");
+                    sentNotifications.add(alertKey);
+                }
             }
+
+            // check expired
             if (item.isExpired()) {
-                sendNotification(notificationId++, "Expired Medication Warning", "Controller medication " + item.name + " has expired!");
+                String alertKey = item.id + "_expired";
+                currentAlerts.add(alertKey);
+                if (!sentNotifications.contains(alertKey)) {
+                    sendNotification(notificationId++, "Expired Medication Warning", 
+                            (item.type.equals("controller") ? "Controller" : "Rescue") + " medication " + item.name + " has expired!");
+                    sentNotifications.add(alertKey);
+                }
             }
         }
-        for (InventoryItem item : rescueItems) {
-            if (item.percentLeft <= 0) {
-                sendNotification(notificationId++, "Empty Medication Warning", "Rescue medication " + item.name + " is empty!");
-            } else if (item.isLow()) {
-                sendNotification(notificationId++, "Low Medication Warning", "Rescue medication " + item.name + " is running low (" + item.percentLeft + "% left).");
-            }
-            if (item.isExpired()) {
-                sendNotification(notificationId++, "Expired Medication Warning", "Rescue medication " + item.name + " has expired!");
-            }
-        }
+
+        prefs.edit().putStringSet(KEY_SENT_NOTIFICATIONS, currentAlerts).apply();
     }
 
     private void sendNotification(int id, String title, String content) {
