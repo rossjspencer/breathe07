@@ -75,8 +75,6 @@ android:gravity="center_vertical">
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="32dp"
-    android:text="Register"
-    android:textColor="@android:color/white"
-    android:backgroundTint="#1565C0" />
+    android:text="Register" />
 
 </LinearLayout>
