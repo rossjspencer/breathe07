@@ -15,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Always show the login/register screen; no auto-redirect
         setContentView(R.layout.activity_main);
 
 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
