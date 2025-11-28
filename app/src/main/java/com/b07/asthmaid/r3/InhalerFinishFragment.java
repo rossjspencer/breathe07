@@ -31,7 +31,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 public class InhalerFinishFragment extends Fragment {
 
-    // Use same temp user ID as other fragments
+    // use same temp user ID as other fragments
     private static final String TEMP_USER_ID = "testUserId";
     private DatabaseReference statsRef;
 
@@ -44,23 +44,22 @@ public class InhalerFinishFragment extends Fragment {
         Button homeButton = view.findViewById(R.id.finishHomeButton);
         TextView statsText = view.findViewById(R.id.statsText);
 
-        statsRef = FirebaseDatabase.getInstance().getReference("guide_stats").child(TEMP_USER_ID);
-
-        updateStats(statsText);
-
         Party party = new PartyFactory(new Emitter(100L, TimeUnit.MILLISECONDS).max(100))
                 .spread(360)
                 .colors(Arrays.asList(0xfce18a, 0xff726d, 0xf4306d, 0xb48def))
                 .setSpeedBetween(0f, 30f)
                 .position(0.5, 0.3)
                 .build();
-
         konfettiView.start(party);
 
+        statsRef = FirebaseDatabase.getInstance().getReference("guide_stats").child(TEMP_USER_ID);
+
+        updateStats(statsText);
+
         homeButton.setOnClickListener(v -> {
-            // Return to home screen
+            // return to home screen
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                // Clear back stack to go back to HomeFragment
+                // clear back stack to go back to HomeFragment
                 getParentFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
         });
@@ -77,34 +76,29 @@ public class InhalerFinishFragment extends Fragment {
                     stats = new GuideStats(0, 0, "");
                 }
 
+                // only update counters if session was successful
                 String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-                
+                    
                 boolean sessionCountedToday = today.equals(stats.lastSessionDate);
-                
+                    
                 if (!sessionCountedToday) {
                     stats.totalSessions++;
 
-                    // Check streak
+                    // check streak
                     if (isConsecutiveDay(stats.lastSessionDate, today)) {
                         stats.streakDays++;
                     } else if (!today.equals(stats.lastSessionDate)) {
-                        // Reset streak if missed a day (and it's not just the same day)
-                        // Note: If it's the first ever session, streak becomes 1.
                         stats.streakDays = 1;
                     }
-                    
+                        
                     stats.lastSessionDate = today;
                     statsRef.setValue(stats);
                 } else {
-                    // Optionally increment totalSessions even if same day? 
-                    // "number of days in a row where a technique session was completed" implies streak is daily.
-                    // "total number of times a user completed" implies just a counter.
-                    // Let's increment totalSessions regardless of day, but only update streak once per day.
-                    
-                    // Re-fetch to avoid race conditions in a real app, but here we just increment locally
+                    // increment total sessions even if same day
                     stats.totalSessions++;
                     statsRef.setValue(stats);
                 }
+
                 
                 if (getContext() != null) {
                     String text = "Total Sessions: " + stats.totalSessions + "\n" +
@@ -115,7 +109,7 @@ public class InhalerFinishFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
+                // handle error
             }
         });
     }

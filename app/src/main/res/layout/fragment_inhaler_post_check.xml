@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvPostCheckTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:text="Post-Dose Check"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/layoutBreathingRating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvPostCheckTitle"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How is your breathing now? (1=Poor, 5=Great)"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroupBreathing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <RadioButton
+                android:id="@+id/radioBreathing1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"
+                android:layout_marginEnd="16dp"/>
+            <RadioButton
+                android:id="@+id/radioBreathing2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"
+                android:layout_marginEnd="16dp"/>
+            <RadioButton
+                android:id="@+id/radioBreathing3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"
+                android:layout_marginEnd="16dp"/>
+            <RadioButton
+                android:id="@+id/radioBreathing4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"
+                android:layout_marginEnd="16dp"/>
+            <RadioButton
+                android:id="@+id/radioBreathing5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutComparison"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layoutBreathingRating"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Compared to before my dose, I feel:"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroupComparison"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/radioBetter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Better"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"/>
+            <RadioButton
+                android:id="@+id/radioSame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="The Same"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"/>
+            <RadioButton
+                android:id="@+id/radioWorse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Worse"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/postCheckNextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:text="Next"
+        android:enabled="false"/>
+
+</RelativeLayout>

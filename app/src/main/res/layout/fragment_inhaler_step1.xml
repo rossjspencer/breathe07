@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="Seal your lips tightly around the opening of the inhaler."
+        android:text="Let's begin!\n\nSeal your lips tightly around the opening of the inhaler."
         android:textColor="@android:color/white"
         android:textSize="24sp" />
 

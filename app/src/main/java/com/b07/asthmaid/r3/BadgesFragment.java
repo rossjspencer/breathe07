@@ -21,10 +21,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class BadgesFragment extends Fragment {
 
     private static final String TEMP_USER_ID = "testUserId";
     private DatabaseReference statsRef;
+    private DatabaseReference logsRef;
 
     @Nullable
     @Override
@@ -46,8 +53,9 @@ public class BadgesFragment extends Fragment {
         ImageView badge3Lock = view.findViewById(R.id.badge3Lock);
 
         statsRef = FirebaseDatabase.getInstance().getReference("guide_stats").child(TEMP_USER_ID);
+        logsRef = FirebaseDatabase.getInstance().getReference("medicine_logs").child("rescue").child(TEMP_USER_ID);
 
-        // badges should be grayscale by default
+        // Initial grayscale application
         applyGrayscale(badge1Image);
         applyGrayscale(badge2Image);
         applyGrayscale(badge3Image);
@@ -76,22 +84,64 @@ public class BadgesFragment extends Fragment {
                                   LinearLayout b2Layout, ImageView b2Image, ImageView b2Lock,
                                   LinearLayout b3Layout, ImageView b3Image, ImageView b3Lock) {
         
+        // check guide stats
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GuideStats stats = snapshot.getValue(GuideStats.class);
                 
-                // badge 1 check
+                // badge 1 check (10 Sessions)
                 if (stats != null && stats.totalSessions >= 10) {
                     unlockBadge(b1Layout, b1Image, b1Lock, R.drawable.badge_ten_sessions);
                 }
 
-                // badge 2 and 3 stuff goes here
+                // Badge 2 (Placeholder) - Unobtainable for now
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 System.out.println("Why does this keep happening!?!?");
+            }
+        });
+
+        // badge 3 check
+        checkRescueUsage(b3Layout, b3Image, b3Lock);
+    }
+
+    private void checkRescueUsage(LinearLayout layout, ImageView image, ImageView lock) {
+        logsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            //TODO: MAKE THRESHOLDS CONFIGURABLE
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int countLast30Days = 0;
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_YEAR, -30);
+                Date thirtyDaysAgo = cal.getTime();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    RescueLogEntry entry = child.getValue(RescueLogEntry.class);
+                    if (entry != null && entry.timestamp != null) {
+                        try {
+                            Date entryDate = sdf.parse(entry.timestamp);
+                            if (entryDate != null && entryDate.after(thirtyDaysAgo)) {
+                                countLast30Days++;
+                            }
+                        } catch (ParseException e) {
+                            // ignore parse errors
+                        }
+                    }
+                }
+
+                // <= 4 uses in 30 days earns the badge
+                if (countLast30Days <= 4) {
+                    unlockBadge(layout, image, lock, R.drawable.badge_low_rescue_month);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // handle error
             }
         });
     }

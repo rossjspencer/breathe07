@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.b07.asthmaid.InhalerLogPromptFragment;
 import com.b07.asthmaid.R;
 
 public class InhalerStep3Fragment extends Fragment {
@@ -31,25 +32,23 @@ public class InhalerStep3Fragment extends Fragment {
         Button finishButton = view.findViewById(R.id.step3FinishButton);
         Button anotherPuffButton = view.findViewById(R.id.step3AnotherPuffButton);
 
-        // Initialize progress bar
         progressBar.setProgress(0);
 
-        // Hide buttons initially for fade-in effect
         finishButton.setVisibility(View.INVISIBLE);
         anotherPuffButton.setVisibility(View.INVISIBLE);
         finishButton.setAlpha(0f);
         anotherPuffButton.setAlpha(0f);
 
-        // Start 10 second timer (10000ms)
+        // start 10 second timer
         long totalTime = 10000;
         
-        timer = new CountDownTimer(totalTime, 10) { // Update every 10ms for smooth progress
+        timer = new CountDownTimer(totalTime, 10) { // update every 10ms
             @Override
             public void onTick(long millisUntilFinished) {
-                // Update text (rounded up seconds)
+                // update text
                 timerText.setText(String.valueOf(millisUntilFinished / 1000 + 1));
                 
-                // Update progress bar (reversed: appearing clockwise)
+                // update progress bar
                 long elapsed = totalTime - millisUntilFinished;
                 int progress = (int) ((elapsed * 1000) / totalTime);
                 progressBar.setProgress(progress);
@@ -58,9 +57,9 @@ public class InhalerStep3Fragment extends Fragment {
             @Override
             public void onFinish() {
                 timerText.setText("0");
-                progressBar.setProgress(1000); // Ensure full circle at end
+                progressBar.setProgress(1000); // ensure full circle at end
                 
-                // Show and fade in buttons
+                // show and fade in buttons
                 finishButton.setVisibility(View.VISIBLE);
                 anotherPuffButton.setVisibility(View.VISIBLE);
                 
@@ -73,7 +72,7 @@ public class InhalerStep3Fragment extends Fragment {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                     android.R.anim.fade_in, android.R.anim.fade_out);
-            transaction.replace(R.id.fragment_container, new InhalerFinishFragment());
+            transaction.replace(R.id.fragment_container, new InhalerLogPromptFragment());
             transaction.addToBackStack(null);
             transaction.commit();
         });

@@ -33,7 +33,7 @@ public class InhalerGuideFragment extends Fragment {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                     android.R.anim.fade_in, android.R.anim.fade_out);
-            transaction.replace(R.id.fragment_container, new InhalerStep1Fragment());
+            transaction.replace(R.id.fragment_container, new InhalerPreCheckFragment());
             transaction.addToBackStack(null);
             transaction.commit();
         });

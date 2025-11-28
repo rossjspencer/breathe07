@@ -52,6 +52,7 @@ public class InventoryFragment extends Fragment {
     private Button controllerButton;
     private Button rescueButton;
     private Button addItemButton;
+    private Button backButton;
 
     private InventoryDisplayHandler displayHandler;
     private final List<InventoryItem> controllerItems = new ArrayList<>();
@@ -90,6 +91,7 @@ public class InventoryFragment extends Fragment {
         controllerButton = view.findViewById(R.id.inventoryControllerButton);
         rescueButton = view.findViewById(R.id.inventoryRescueButton);
         addItemButton = view.findViewById(R.id.inventoryAddButton);
+        //backButton = view.findViewById(R.id.backButton);
 
         displayHandler = new InventoryDisplayHandler();
         displayHandler.setOnDeleteClickListener(this::showDeleteConfirmDialog);
@@ -108,6 +110,14 @@ public class InventoryFragment extends Fragment {
 
         addItemButton.setOnClickListener(v -> showAddItemDialog());
 
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> {
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
+        }
+
         loadInventoryFromFirebase();
 
         return view;
@@ -116,7 +126,7 @@ public class InventoryFragment extends Fragment {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Inventory Alerts";
-            String description = "Notifications for low, empty, or expired medication";
+            String description = "Notifications for low or expired medication";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -245,8 +255,7 @@ public class InventoryFragment extends Fragment {
                     String remainingStr = remainingEdit.getText().toString().trim();
 
                     if (TextUtils.isEmpty(name) || TextUtils.isEmpty(capacityStr)) {
-                        Toast.makeText(getContext(), "Name and Capacity are required",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Name and Capacity are required", Toast.LENGTH_SHORT).show();
                         return;
                     }
 

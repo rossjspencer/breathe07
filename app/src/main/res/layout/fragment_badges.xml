@@ -21,10 +21,21 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Badges"
+        android:text="Awards"
         android:textSize="32sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/textCurrentStreak"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Current Streak: 0 Days 🔥"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#FF5722"
         android:layout_marginBottom="24dp" />
 
     <ScrollView
@@ -69,7 +80,7 @@
                     android:id="@+id/badge1Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Beginner Breather"
+                    android:text="Diaphragm Decathlon"
                     android:textStyle="bold"
                     android:textSize="24sp"
                     android:layout_marginTop="12dp"/>
@@ -78,7 +89,7 @@
                     android:id="@+id/badge1Desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Complete 10 Technique Sessions"
+                    android:text="Complete 10 High-Quality Doses"
                     android:textSize="18sp"
                     android:gravity="center"/>
             </LinearLayout>
@@ -161,7 +172,7 @@
                     android:id="@+id/badge3Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Placeholder"
+                    android:text="Well Controlled"
                     android:textStyle="bold"
                     android:textSize="24sp"
                     android:layout_marginTop="12dp"/>
@@ -170,7 +181,7 @@
                     android:id="@+id/badge3Desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Placeholder"
+                    android:text="4 or fewer Rescue uses in 30 days"
                     android:textSize="18sp"
                     android:gravity="center"/>
             </LinearLayout>
