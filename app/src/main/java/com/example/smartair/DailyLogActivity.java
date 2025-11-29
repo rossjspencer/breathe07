@@ -20,8 +20,10 @@ public class DailyLogActivity extends AppCompatActivity {
 
     private SeekBar severitySeekBar;
     private TextView severityValueText;
+    private TextView tvLogChildName;
     private EditText notesInput;
     private Button saveButton;
+    private Button cancelButton;
 
     // CheckBoxes
     private CheckBox cbCough, cbWheezing, cbShortness, cbChest, cbNightWaking, cbDust, cbPollen,
@@ -30,12 +32,29 @@ public class DailyLogActivity extends AppCompatActivity {
     private DatabaseReference databaseRef;
     private FirebaseAuth auth;
 
+    // New Variables for Targeting
+    private String targetChildId = null;
+    private String loggedByRole = "Parent"; // Default
+    private String childName = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_log);
         auth = FirebaseAuth.getInstance();
         databaseRef = FirebaseDatabase.getInstance().getReference("logs");
+
+        // Extract Extras
+        if (getIntent().hasExtra("CHILD_ID")) {
+            targetChildId = getIntent().getStringExtra("CHILD_ID");
+        }
+        if (getIntent().hasExtra("LOGGED_BY_ROLE")) {
+            loggedByRole = getIntent().getStringExtra("LOGGED_BY_ROLE");
+        }
+        if (getIntent().hasExtra("CHILD_NAME")) {
+            childName = getIntent().getStringExtra("CHILD_NAME");
+        }
+
         initializeViews();
         setupListeners();
     }
@@ -43,15 +62,18 @@ public class DailyLogActivity extends AppCompatActivity {
     private void initializeViews() {
         severitySeekBar = findViewById(R.id.severity_seekbar);
         severityValueText = findViewById(R.id.severity_value_text);
+        tvLogChildName = findViewById(R.id.tvLogChildName);
         notesInput = findViewById(R.id.notes_input);
         saveButton = findViewById(R.id.save_log_button);
+        cancelButton = findViewById(R.id.cancel_log_button);
+
         // Symptoms
         cbCough = findViewById(R.id.cb_cough);
         cbWheezing = findViewById(R.id.cb_wheezing);
         cbShortness = findViewById(R.id.cb_shortness);
         cbChest = findViewById(R.id.cb_chest);
         cbNightWaking = findViewById(R.id.cb_night_waking);
-        
+
         rgActivityLimitation = findViewById(R.id.rg_activity_limitation);
         // Triggers
         cbDust = findViewById(R.id.cb_dust);
@@ -62,6 +84,13 @@ public class DailyLogActivity extends AppCompatActivity {
         cbColdAir = findViewById(R.id.cb_cold_air);
         cbIllness = findViewById(R.id.cb_illness);
         cbPcs = findViewById(R.id.cb_pcs);
+
+        // Set Child Name if available
+        if (childName != null && !childName.isEmpty()) {
+            tvLogChildName.setText("(" + childName + ")");
+        } else {
+            tvLogChildName.setText("");
+        }
     }
 
     private void setupListeners() {
@@ -74,14 +103,20 @@ public class DailyLogActivity extends AppCompatActivity {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
         saveButton.setOnClickListener(v -> saveLog());
+        cancelButton.setOnClickListener(v -> finish());
     }
 
     private void saveLog() {
-        if (auth.getCurrentUser() == null) {
-            Toast.makeText(this, "User not logged in!", Toast.LENGTH_SHORT).show();
-            return;
+        String uid;
+        if (targetChildId != null) {
+            uid = targetChildId;
+        } else {
+            if (auth.getCurrentUser() == null) {
+                Toast.makeText(this, "User not logged in!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            uid = auth.getCurrentUser().getUid();
         }
-        String uid = auth.getCurrentUser().getUid();
 
         List<String> symptoms = new ArrayList<>();
         if (cbCough.isChecked()) symptoms.add("Cough");
@@ -99,7 +134,7 @@ public class DailyLogActivity extends AppCompatActivity {
         if (cbColdAir.isChecked()) triggers.add("Cold air");
         if (cbIllness.isChecked()) triggers.add("Illness");
         if (cbPcs.isChecked()) triggers.add("Perfumes/Cleaners/Strong Odors");
-        
+
         String activityLimitation = "None";
         int selectedId = rgActivityLimitation.getCheckedRadioButtonId();
         if (selectedId != -1) {
@@ -111,19 +146,27 @@ public class DailyLogActivity extends AppCompatActivity {
         String notes = notesInput.getText().toString();
         long timestamp = System.currentTimeMillis();
 
-        SymptomLog log = new SymptomLog(timestamp, symptoms, triggers, severity, activityLimitation, notes);
+        // Determine final "Logged By" string
+        String loggedByString;
+        if ("Child".equals(loggedByRole)) {
+            loggedByString = "Child - " + (childName.isEmpty() ? "Unknown" : childName);
+        } else {
+            loggedByString = "Parent";
+        }
+
+        SymptomLog log = new SymptomLog(timestamp, symptoms, triggers, severity, activityLimitation, notes, loggedByString);
 
         String logId = databaseRef.child(uid).push().getKey();
         if (logId != null) {
             databaseRef.child(uid).child(logId).setValue(log)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(DailyLogActivity.this, "Log saved!", Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        Toast.makeText(DailyLogActivity.this, "Failed to save log.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(DailyLogActivity.this, "Log saved!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(DailyLogActivity.this, "Failed to save log.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     }
 }
