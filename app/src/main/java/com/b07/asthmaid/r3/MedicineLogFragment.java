@@ -149,6 +149,7 @@ public class MedicineLogFragment extends Fragment {
             updateSpinner(spinnerInhalerName, selectedType);
         });
 
+        //set up cant find inhaler button
         btnCantFindInhaler.setOnClickListener(v -> {
             new AlertDialog.Builder(requireContext())
                     .setMessage("Ask your parent to add your inhaler to their Inventory with a name you'll both remember. Then, it should show up on the list!")
@@ -273,6 +274,8 @@ public class MedicineLogFragment extends Fragment {
                         item.remainingDoses += doseToRestore;
                         if (item.remainingDoses > item.doseCapacity) item.remainingDoses = item.doseCapacity;
                         item.updatePercentLeft();
+
+                        //update firebase
                         child.getRef().setValue(item);
                     }
                 }

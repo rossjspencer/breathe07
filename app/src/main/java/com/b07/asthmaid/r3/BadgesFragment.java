@@ -154,21 +154,19 @@ public class BadgesFragment extends Fragment {
                 if (b1 != null) badge1Threshold = b1;
                 if (b3 != null) badge3Threshold = b3;
                 
-                // update UI descriptions
+                // update UI descriptions based on settings
                 if (badge1Desc != null) {
                     badge1Desc.setText("Complete " + badge1Threshold + " high-quality inhaler doses");
                 }
                 if (badge3Desc != null) {
                     badge3Desc.setText("Use your Rescue inhaler " + badge3Threshold + " or fewer times in 30 days");
                 }
-                
-                // Now check status with loaded values
+
                 checkBadgeStatus(b1Layout, b1Image, b1Lock, b2Layout, b2Image, b2Lock, b3Layout, b3Image, b3Lock, streakText);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // If failed, proceed with defaults
                 checkBadgeStatus(b1Layout, b1Image, b1Lock, b2Layout, b2Image, b2Lock, b3Layout, b3Image, b3Lock, streakText);
             }
         });
