@@ -142,13 +142,7 @@ public class HistoryActivity extends AppCompatActivity {
         else if (filterMonths == 6) tvMonth6.performClick();
 
         // Load Checkboxes for content filter
-        // Note: In a real app, we'd dynamically generate checkboxes or use a multi-select dialog.
-        // For simplicity here, we will just filter by time first. Content filtering 
-        // requires a more complex UI (RecyclerView inside Dialog).
-        // Let's just launch a standard multi-choice dialog for Symptoms/Triggers on top?
-        // Or keep it simple: Just Timeframe for now as per "Polished Plan" Step 3 mentions checkboxes.
-        
-        // Let's use the "Content" button inside this dialog to open the multi-selects
+
         TextView btnSelectSymptoms = view.findViewById(R.id.btnSelectSymptoms);
         TextView btnSelectTriggers = view.findViewById(R.id.btnSelectTriggers);
         
