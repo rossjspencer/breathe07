@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="32dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#E4F1E2">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome Parent!"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Here’s how the Parent role works:\n\n• You control sharing\n• You can manage providers\n• You can see child data\n"
+        android:textSize="16sp"
+        android:layout_marginBottom="40dp" />
+
+    <Button
+        android:id="@+id/continue_button"
+        android:layout_width="140dp"
+        android:layout_height="50dp"
+        android:text="Continue"
+        android:textColor="#000000"
+        android:background="@drawable/rounded_button" />
+
+</LinearLayout>

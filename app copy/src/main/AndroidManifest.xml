@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.smartair">
 
-    <!-- Android 13+ runtime permission -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -32,9 +29,6 @@
         <activity android:name=".ProviderReportActivity" android:exported="false" />
         <activity android:name=".PdfPreviewActivity" android:exported="false" />
         <activity android:name=".TrendDetailActivity" android:exported="false" />
-        <activity android:name=".R4.pef.PefEntryActivity"/>
-        <activity android:name=".R4.triage.TriageActivity"/>
-        <activity android:name=".R4.pef.ParentSetPbActivity" />
 
         <activity
             android:name=".MainActivity"

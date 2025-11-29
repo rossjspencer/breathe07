@@ -1,0 +1,7 @@
+<resources>
+<string name="app_name">Smart Air</string>
+<string-array name="roles_array">
+    <item>Parent</item>
+    <item>Provider</item>
+</string-array>
+</resources>
