@@ -1,10 +1,7 @@
 package com.b07.asthmaid.r3;
 
 import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -25,8 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,19 +33,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class InventoryFragment extends Fragment {
 
     private enum InventoryType { CONTROLLER, RESCUE }
 
-    // replace with real user id obviously
     private static final String TEMP_USER_ID = "testUserId";
-    private static final String CHANNEL_ID = "inventory_alerts";
-    private static final String PREFS_NAME = "InventoryAlertPrefs";
-    private static final String KEY_SENT_NOTIFICATIONS = "sent_notifications";
 
     private RecyclerView recyclerView;
     private Button controllerButton;
@@ -81,8 +69,7 @@ public class InventoryFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_inventory, container, false);
 
-        createNotificationChannel();
-
+        //might not be necessary?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
@@ -128,18 +115,6 @@ public class InventoryFragment extends Fragment {
         return view;
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Inventory Alerts";
-            String description = "Notifications for low or expired medication";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
     private void loadInventoryFromFirebase() {
         inventoryRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -169,7 +144,6 @@ public class InventoryFragment extends Fragment {
                     }
                 }
 
-                checkAndSendNotifications();
                 showCurrentList();
             }
 
@@ -178,74 +152,6 @@ public class InventoryFragment extends Fragment {
                 System.out.println("Something went wrong again! Why does this keep happening!?");
             }
         });
-    }
-
-    private void checkAndSendNotifications() {
-        if (getContext() == null) return;
-
-        SharedPreferences prefs = getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        Set<String> sentNotifications = prefs.getStringSet(KEY_SENT_NOTIFICATIONS, new HashSet<>());
-        Set<String> currentAlerts = new HashSet<>();
-
-        int notificationId = 1;
-
-        List<InventoryItem> allItems = new ArrayList<>(controllerItems);
-        allItems.addAll(rescueItems);
-
-        for (InventoryItem item : allItems) {
-            if (item.id == null) continue;
-
-            // check empty
-            if (item.percentLeft <= 0) {
-                String alertKey = item.id + "_empty";
-                currentAlerts.add(alertKey);
-                if (!sentNotifications.contains(alertKey)) {
-                    sendNotification(notificationId++, "Empty Medication Warning", 
-                            (item.type.equals("controller") ? "Controller" : "Rescue") + " medication " + item.name + " is empty!");
-                    sentNotifications.add(alertKey);
-                }
-            } 
-            // check low
-            else if (item.isLow()) {
-                String alertKey = item.id + "_low";
-                currentAlerts.add(alertKey);
-                if (!sentNotifications.contains(alertKey)) {
-                    sendNotification(notificationId++, "Low Medication Warning", 
-                            (item.type.equals("controller") ? "Controller" : "Rescue") + " medication " + item.name + " is running low (" + item.percentLeft + "% left).");
-                    sentNotifications.add(alertKey);
-                }
-            }
-
-            // check expired
-            if (item.isExpired()) {
-                String alertKey = item.id + "_expired";
-                currentAlerts.add(alertKey);
-                if (!sentNotifications.contains(alertKey)) {
-                    sendNotification(notificationId++, "Expired Medication Warning", 
-                            (item.type.equals("controller") ? "Controller" : "Rescue") + " medication " + item.name + " has expired!");
-                    sentNotifications.add(alertKey);
-                }
-            }
-        }
-
-        prefs.edit().putStringSet(KEY_SENT_NOTIFICATIONS, currentAlerts).apply();
-    }
-
-    private void sendNotification(int id, String title, String content) {
-        if (getContext() == null) return;
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
-        notificationManager.notify(id, builder.build());
     }
 
     private void showCurrentList() {
@@ -341,7 +247,6 @@ public class InventoryFragment extends Fragment {
         } else {
             rescueItems.add(item);
         }
-        checkAndSendNotifications();
         showCurrentList();
     }
 

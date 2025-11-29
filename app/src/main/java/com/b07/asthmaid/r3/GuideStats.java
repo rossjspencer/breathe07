@@ -7,19 +7,22 @@ public class GuideStats {
     public int totalSessions;
     public int streakDays;
     public String lastSessionDate;
+    public String accountCreationDate; // "yyyy-MM-dd"
     public Map<String, Boolean> earnedBadges;
 
     public GuideStats() {
         this.totalSessions = 0;
         this.streakDays = 0;
         this.lastSessionDate = "";
+        this.accountCreationDate = "";
         this.earnedBadges = new HashMap<>();
     }
 
-    public GuideStats(int totalSessions, int streakDays, String lastSessionDate) {
+    public GuideStats(int totalSessions, int streakDays, String lastSessionDate, String accountCreationDate) {
         this.totalSessions = totalSessions;
         this.streakDays = streakDays;
         this.lastSessionDate = lastSessionDate;
+        this.accountCreationDate = accountCreationDate;
         this.earnedBadges = new HashMap<>();
     }
     

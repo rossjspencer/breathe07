@@ -30,23 +30,18 @@ public class InhalerWaitFragment extends Fragment {
         progressBar = view.findViewById(R.id.waitTimerProgress);
         Button nextButton = view.findViewById(R.id.waitNextButton);
 
-        // Initialize progress bar
         progressBar.setProgress(0);
 
-        // Hide button initially for fade-in effect
         nextButton.setVisibility(View.INVISIBLE);
         nextButton.setAlpha(0f);
 
-        // Start 30 second timer (30000ms)
         long totalTime = 30000;
 
-        timer = new CountDownTimer(totalTime, 10) { // Update every 10ms for smooth progress
+        timer = new CountDownTimer(totalTime, 10) {
             @Override
             public void onTick(long millisUntilFinished) {
-                // Update text (rounded up seconds)
                 timerText.setText(String.valueOf(millisUntilFinished / 1000 + 1));
 
-                // Update progress bar (reversed: appearing clockwise)
                 long elapsed = totalTime - millisUntilFinished;
                 int progress = (int) ((elapsed * 1000) / totalTime);
                 progressBar.setProgress(progress);
@@ -55,20 +50,18 @@ public class InhalerWaitFragment extends Fragment {
             @Override
             public void onFinish() {
                 timerText.setText("0");
-                progressBar.setProgress(1000); // Ensure full circle at end
-                
-                // Show and fade in button
+                progressBar.setProgress(1000);
+
                 nextButton.setVisibility(View.VISIBLE);
                 nextButton.animate().alpha(1f).setDuration(1000).start();
             }
         }.start();
 
         nextButton.setOnClickListener(v -> {
-            // Navigate back to InhalerStep1Fragment
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                     android.R.anim.fade_in, android.R.anim.fade_out);
-            transaction.replace(R.id.fragment_container, new InhalerStep1Fragment());
+            transaction.replace(R.id.fragment_container, new InhalerRepeatDoseFragment());
             transaction.addToBackStack(null);
             transaction.commit();
         });

@@ -9,9 +9,4 @@ public class ControllerLogEntry extends MedicineLogEntry {
     public ControllerLogEntry(String name, int doseCount, String timestamp){
         super(name, doseCount, timestamp);
     }
-
-    @Override
-    public void storeEntry(MedicineLog log) {
-        log.addEntry(this);
-    }
 }

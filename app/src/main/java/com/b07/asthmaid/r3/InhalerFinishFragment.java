@@ -17,7 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.b07.asthmaid.HomeFragment;
 import com.b07.asthmaid.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,11 +40,15 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 public class InhalerFinishFragment extends Fragment {
 
+    // use same temp user ID as other fragments.
+    // TODO: UPDATE THIS AAAAAAAAAHHH AAAAAAAAAAAAAAAAAHHH
     private static final String TEMP_USER_ID = "testUserId";
     private static final String BADGE_CHANNEL_ID = "badge_alerts";
     
     private DatabaseReference statsRef;
+    private DatabaseReference settingsRef;
     private boolean wasSuccessful = false;
+    private int badge1Threshold = 10; // default
 
     @Nullable
     @Override
@@ -59,7 +65,6 @@ public class InhalerFinishFragment extends Fragment {
         Button homeButton = view.findViewById(R.id.finishHomeButton);
         TextView statsText = view.findViewById(R.id.statsText);
 
-
         Party party = new PartyFactory(new Emitter(100L, TimeUnit.MILLISECONDS).max(100))
                 .spread(360)
                 .colors(Arrays.asList(0xfce18a, 0xff726d, 0xf4306d, 0xb48def))
@@ -69,16 +74,41 @@ public class InhalerFinishFragment extends Fragment {
         konfettiView.start(party);
 
         statsRef = FirebaseDatabase.getInstance().getReference("guide_stats").child(TEMP_USER_ID);
+        settingsRef = FirebaseDatabase.getInstance().getReference("badge_settings").child(TEMP_USER_ID);
 
-        updateStats(statsText);
+        // load settings first, then update stats
+        loadSettingsAndUpdateStats(statsText);
 
         homeButton.setOnClickListener(v -> {
+            // clear back stack and explicitly replace with homefragment
+            // only way i could get the button to go back home
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment())
+                    .commit();
         });
 
         return view;
+    }
+    
+    private void loadSettingsAndUpdateStats(TextView statsText) {
+        settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Integer b1 = snapshot.child("badge1_threshold").getValue(Integer.class);
+                if (b1 != null) {
+                    badge1Threshold = b1;
+                }
+                updateStats(statsText);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                updateStats(statsText); // proceed with default
+            }
+        });
     }
 
     private void createNotificationChannel() {
@@ -95,7 +125,7 @@ public class InhalerFinishFragment extends Fragment {
 
     private void sendBadgeNotification(String badgeName) {
         if (getContext() == null) return;
-
+        
         NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), BADGE_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle("Badge Unlocked!")
@@ -117,9 +147,10 @@ public class InhalerFinishFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GuideStats stats = snapshot.getValue(GuideStats.class);
                 if (stats == null) {
-                    stats = new GuideStats(0, 0, "");
+                    stats = new GuideStats(0, 0, "", "");
                 }
 
+                // only update counters if session was successful
                 if (wasSuccessful) {
                     String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
                     
@@ -128,6 +159,7 @@ public class InhalerFinishFragment extends Fragment {
                     if (!sessionCountedToday) {
                         stats.totalSessions++;
 
+                        // check streak
                         if (isConsecutiveDay(stats.lastSessionDate, today)) {
                             stats.streakDays++;
                         } else if (!today.equals(stats.lastSessionDate)) {
@@ -137,12 +169,14 @@ public class InhalerFinishFragment extends Fragment {
                         stats.lastSessionDate = today;
                         statsRef.setValue(stats);
                     } else {
+                        // increment total sessions even if same day
                         stats.totalSessions++;
                         statsRef.setValue(stats);
                     }
 
-                    if (stats.totalSessions >= 10 && !stats.hasBadge("badge_10_sessions")) {
-                        sendBadgeNotification("Diaphragm Decathlon");
+                    // check badge one sessions
+                    if (stats.totalSessions >= badge1Threshold && !stats.hasBadge("badge_10_sessions")) {
+                        sendBadgeNotification("Beginner Breather");
                     }
                 }
                 

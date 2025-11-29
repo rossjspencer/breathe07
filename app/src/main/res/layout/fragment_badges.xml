@@ -1,50 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/badgesBackButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="16dp">
+            android:text="Back" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/badgesBackButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back" />
-        </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Awards"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textCurrentStreak"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Current Streak: 0 Days 🔥"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#FF5722"
+        android:layout_marginBottom="24dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/loadingSpinner"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Awards"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/textCurrentStreak"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Current Streak: 0 Days 🔥"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:textColor="#FF5722"
-            android:layout_marginBottom="24dp" />
+            android:layout_gravity="center" />
 
         <ScrollView
+            android:id="@+id/badgesScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="invisible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -62,8 +70,11 @@
                     android:layout_marginBottom="32dp">
 
                     <FrameLayout
+                        android:id="@+id/badge1Frame"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true">
 
                         <ImageView
                             android:id="@+id/badge1Image"
@@ -84,7 +95,7 @@
                         android:id="@+id/badge1Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Diaphragm Decathlon"
+                        android:text="Beginner Breather"
                         android:textStyle="bold"
                         android:textSize="24sp"
                         android:layout_marginTop="12dp"/>
@@ -93,7 +104,7 @@
                         android:id="@+id/badge1Desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Complete 10 Technique Sessions"
+                        android:text="Complete 10 Quality Technique Sessions"
                         android:textSize="18sp"
                         android:gravity="center"/>
                 </LinearLayout>
@@ -108,6 +119,7 @@
                     android:layout_marginBottom="32dp">
 
                     <FrameLayout
+                        android:id="@+id/badge2Frame"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
@@ -130,7 +142,7 @@
                         android:id="@+id/badge2Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Placeholder"
+                        android:text="Consistent Controller"
                         android:textStyle="bold"
                         android:textSize="24sp"
                         android:layout_marginTop="12dp"/>
@@ -139,7 +151,7 @@
                         android:id="@+id/badge2Desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Placeholder"
+                        android:text="Perfectly follow your Parent's\nController schedule for one week"
                         android:textSize="18sp"
                         android:gravity="center"/>
                 </LinearLayout>
@@ -154,8 +166,11 @@
                     android:layout_marginBottom="32dp">
 
                      <FrameLayout
+                        android:id="@+id/badge3Frame"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true">
 
                         <ImageView
                             android:id="@+id/badge3Image"
@@ -185,48 +200,13 @@
                         android:id="@+id/badge3Desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="&lt; 4 Rescue uses in 30 days"
+                        android:text="Use your Rescue inhaler\n 4 or fewer times in 30 days"
                         android:textSize="18sp"
                         android:gravity="center"/>
                 </LinearLayout>
 
             </LinearLayout>
         </ScrollView>
-    </LinearLayout>
+    </FrameLayout>
 
-    <RelativeLayout
-        android:id="@+id/overlayLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CC000000"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true"
-        android:elevation="10dp">
-
-        <nl.dionsegijn.konfetti.xml.KonfettiView
-            android:id="@+id/konfettiViewBadge"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <ImageView
-            android:id="@+id/overlayBadgeImage"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_centerInParent="true" />
-
-        <TextView
-            android:id="@+id/overlayBadgeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/overlayBadgeImage"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp"
-            android:textColor="@android:color/white"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center" />
-
-    </RelativeLayout>
-
-</FrameLayout>
+</LinearLayout>

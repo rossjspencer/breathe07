@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,23 +14,21 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.b07.asthmaid.R;
 
-public class InhalerStep1Fragment extends Fragment {
+public class InhalerRepeatDoseFragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_inhaler_step1, container, false);
-        
-        Button nextButton = view.findViewById(R.id.step1NextButton);
+        View view = inflater.inflate(R.layout.fragment_inhaler_repeat_dose, container, false);
+
+        Button nextButton = view.findViewById(R.id.repeatDoseNextButton);
 
         nextButton.setOnClickListener(v -> {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                     android.R.anim.fade_in, android.R.anim.fade_out);
             
-            InhalerStep2Fragment nextFragment = new InhalerStep2Fragment();
-            
-            transaction.replace(R.id.fragment_container, nextFragment);
+            transaction.replace(R.id.fragment_container, new InhalerStep3Fragment());
             transaction.addToBackStack(null);
             transaction.commit();
         });

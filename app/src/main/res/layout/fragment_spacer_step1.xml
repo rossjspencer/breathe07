@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Let's begin!\n\nGive your inhaler a good shake, remove the cap, then seal your lips tightly around the opening."
+            android:text="Let's begin!\n\nGive your inhaler a good shake, remove its cap, then insert it into your spacer.\n\nEnsure the cap is removed from the spacer, and seal your lips tightly around its opening."
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:layout_marginBottom="32dp"/>
@@ -25,8 +25,8 @@
             android:id="@+id/step1Image"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:src="@drawable/inhaler_mouth"
-            android:contentDescription="Inhaler mouth placement" />
+            android:src="@drawable/spacer_assembly"
+            android:contentDescription="Spacer assembly" />
 
     </LinearLayout>
 

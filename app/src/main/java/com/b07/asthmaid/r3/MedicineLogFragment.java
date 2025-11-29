@@ -1,7 +1,12 @@
 package com.b07.asthmaid.r3;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +21,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,12 +46,11 @@ public class MedicineLogFragment extends Fragment {
     private Button controllerButton;
     private Button rescueButton;
 
-    // remember what log type is being shown
     private enum LogType { CONTROLLER, RESCUE }
     private LogType currentType = LogType.CONTROLLER;
 
     public final String TEMP_ID = "kqRPXqmnx5NzlrN5CT5L8vrxIhk1";
-    private static final String TEMP_USER_ID = "testUserId"; // change this later ay ay ay whoa
+    private static final String TEMP_USER_ID = "testUserId";
 
     @Nullable
     @Override
@@ -93,7 +99,7 @@ public class MedicineLogFragment extends Fragment {
         if (currentType == LogType.CONTROLLER) {
             controllerButton.setBackgroundColor(Color.GRAY);
             controllerButton.setTextColor(Color.WHITE);
-            rescueButton.setBackgroundColor(0xFF6200EE); // can be changed later
+            rescueButton.setBackgroundColor(0xFF6200EE);
             rescueButton.setTextColor(Color.WHITE);
         } else {
             rescueButton.setBackgroundColor(Color.GRAY);
@@ -129,10 +135,8 @@ public class MedicineLogFragment extends Fragment {
         RadioButton radioRescue = dialogView.findViewById(R.id.radioRescue);
         Button btnCantFindInhaler = dialogView.findViewById(R.id.btnCantFindInhaler);
 
-        // populate spinner initially based on current view type
         updateSpinner(spinnerInhalerName, currentType);
 
-        // pre-select type
         if (currentType == LogType.CONTROLLER) {
             radioController.setChecked(true);
         } else {
@@ -161,7 +165,6 @@ public class MedicineLogFragment extends Fragment {
                     String selectedInhaler = null;
                     if (spinnerInhalerName.getSelectedItem() != null) {
                         String selection = spinnerInhalerName.getSelectedItem().toString();
-                        // check if it's the empty placeholder
                         if (!selection.equals("No inhalers of this type in Inventory.")) {
                             selectedInhaler = selection;
                         }
@@ -184,7 +187,6 @@ public class MedicineLogFragment extends Fragment {
                         return;
                     }
 
-                    // get current time and use for timestamp
                     String timestamp = new java.text.SimpleDateFormat(
                             "yyyy-MM-dd HH:mm",
                             java.util.Locale.getDefault()
@@ -201,16 +203,13 @@ public class MedicineLogFragment extends Fragment {
                     if (type == LogType.CONTROLLER) {
                         ControllerLogEntry entry = new ControllerLogEntry(selectedInhaler, dose, timestamp);
 
-                        //path can be changed
-                        DatabaseReference typeRef = logReference.child("controller")
-                                .child(TEMP_ID);  // hardcoded for testing
+                        DatabaseReference typeRef = logReference.child("controller").child(TEMP_ID);
                         String key = typeRef.push().getKey();
                         entry.id = key;
                         if (key != null) {
                             typeRef.child(key).setValue(entry);
                         }
 
-                        // sync local
                         medicineLog.addEntry(entry);
                         if (currentType == LogType.CONTROLLER) {
                             showControllerLogs();
@@ -221,9 +220,7 @@ public class MedicineLogFragment extends Fragment {
                     } else {
                         RescueLogEntry entry = new RescueLogEntry(selectedInhaler, dose, timestamp);
 
-                        //path can be changed
-                        DatabaseReference typeRef = logReference.child("rescue")
-                                .child(TEMP_ID);  // hardcoded for testing;
+                        DatabaseReference typeRef = logReference.child("rescue").child(TEMP_ID);
                         String key = typeRef.push().getKey();
                         entry.id = key;
                         if (key != null) {
@@ -250,39 +247,8 @@ public class MedicineLogFragment extends Fragment {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     InventoryItem item = child.getValue(InventoryItem.class);
                     if (item != null) {
-                        // update remaining doses
                         item.remainingDoses -= doseTaken;
                         if (item.remainingDoses < 0) item.remainingDoses = 0;
-                        
-                        // recalculate percentage
-                        item.updatePercentLeft();
-                        
-                        // update Firebase
-                        child.getRef().setValue(item);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // handle error
-            }
-        });
-    }
-    
-    private void restoreInventoryDose(String inhalerName, int doseToRestore, String type) {
-        inventoryRef.child(type).child(TEMP_USER_ID).orderByChild("name").equalTo(inhalerName)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    InventoryItem item = child.getValue(InventoryItem.class);
-                    if (item != null) {
-                        // restore doses
-                        item.remainingDoses += doseToRestore;
-                        if (item.remainingDoses > item.doseCapacity) item.remainingDoses = item.doseCapacity;
-                        
-                        // recalculate percentage
                         item.updatePercentLeft();
                         
                         // update firebase
@@ -292,10 +258,28 @@ public class MedicineLogFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // handle error
-                System.out.println("AAAAAAAAHHHHHH!!! HELPPP!!! HELP ME! HELP! HELP! HEEEEEEEELP!");
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void restoreInventoryDose(String inhalerName, int doseToRestore, String type) {
+        inventoryRef.child(type).child(TEMP_USER_ID).orderByChild("name").equalTo(inhalerName)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    InventoryItem item = child.getValue(InventoryItem.class);
+                    if (item != null) {
+                        item.remainingDoses += doseToRestore;
+                        if (item.remainingDoses > item.doseCapacity) item.remainingDoses = item.doseCapacity;
+                        item.updatePercentLeft();
+                        child.getRef().setValue(item);
+                    }
+                }
             }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
     
@@ -325,10 +309,7 @@ public class MedicineLogFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // handle error
-                System.out.println("bad thing happened.");
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -338,27 +319,20 @@ public class MedicineLogFragment extends Fragment {
                 .setMessage("Are you sure you want to delete this entry?\n\nThis will restore the doses you took on your Parent's Inventory page!")
                 .setPositiveButton("Delete", (dialog, which) -> {
 
-                    // remove locally
                     medicineLog.removeEntry(entry);
 
-                    // try to remove from firebase
                     if (entry.id != null) {
                         String typeNode = (entry instanceof ControllerLogEntry)
                                 ? "controller"
                                 : "rescue";
 
-                        logReference.child(typeNode)
-                                .child(TEMP_ID)
-                                .child(entry.id)
-                                .removeValue();
+                        logReference.child(typeNode).child(TEMP_ID).child(entry.id).removeValue();
                                 
-                        // restore doses in inventory
                         if (entry.name != null) {
                             restoreInventoryDose(entry.name, entry.doseCount, typeNode);
                         }
                     }
 
-                    // refresh current view
                     if (currentType == LogType.CONTROLLER) {
                         showControllerLogs();
                     } else {
@@ -373,7 +347,6 @@ public class MedicineLogFragment extends Fragment {
         logReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // clear local log
                 medicineLog.clear();
 
                 DataSnapshot controllerSnap = snapshot.child("controller").child(TEMP_ID);
@@ -394,7 +367,6 @@ public class MedicineLogFragment extends Fragment {
                     }
                 }
 
-                // refresh list
                 if (currentType == LogType.CONTROLLER) {
                     showControllerLogs();
                 } else {

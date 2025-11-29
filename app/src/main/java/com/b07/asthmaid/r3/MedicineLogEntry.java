@@ -14,6 +14,4 @@ public abstract class MedicineLogEntry {
         this.doseCount = doseCount;
         this.timestamp = timestamp;
     }
-
-    public abstract void storeEntry(MedicineLog log);
 }

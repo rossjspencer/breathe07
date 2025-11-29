@@ -13,25 +13,19 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/repeatDoseText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Let's begin!\n\nGive your inhaler a good shake, remove the cap, then seal your lips tightly around the opening."
+            android:text="Place your mouth back on the opening of your inhaler, breathe out, and breathe in deeply as you press on the top of the inhaler again."
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:layout_marginBottom="32dp"/>
 
-        <ImageView
-            android:id="@+id/step1Image"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:src="@drawable/inhaler_mouth"
-            android:contentDescription="Inhaler mouth placement" />
-
     </LinearLayout>
 
     <Button
-        android:id="@+id/step1NextButton"
+        android:id="@+id/repeatDoseNextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

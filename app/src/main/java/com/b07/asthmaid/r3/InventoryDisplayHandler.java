@@ -80,6 +80,7 @@ public class InventoryDisplayHandler extends RecyclerView.Adapter<InventoryDispl
 
             int color = Color.BLACK;
 
+            //expired/empty items are red, low items are orange
             if (item.isExpired()) {
                 color = Color.RED;
             } else if (item.percentLeft <= 0) {

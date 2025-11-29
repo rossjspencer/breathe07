@@ -1,6 +1,12 @@
 package com.b07.asthmaid;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +21,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -39,6 +48,7 @@ public class InhalerLogPromptFragment extends Fragment {
 
     public final String TEMP_ID = "kqRPXqmnx5NzlrN5CT5L8vrxIhk1";
     private static final String TEMP_USER_ID = "testUserId";
+    private static final String CHANNEL_ID = "inventory_alerts";
 
     private enum LogType { CONTROLLER, RESCUE }
 
@@ -46,6 +56,8 @@ public class InhalerLogPromptFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_inhaler_log_prompt, container, false);
+
+        createNotificationChannel();
 
         if (getArguments() != null) {
             success = getArguments().getBoolean("success", false);
@@ -66,12 +78,27 @@ public class InhalerLogPromptFragment extends Fragment {
         return view;
     }
 
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Inventory Alerts";
+            String description = "Notifications for low or expired medication";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
     private void navigateToPostCheck() {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                 android.R.anim.fade_in, android.R.anim.fade_out);
         
         InhalerPostCheckFragment fragment = new InhalerPostCheckFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("success", success);
+        fragment.setArguments(args);
         
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
@@ -95,6 +122,7 @@ public class InhalerLogPromptFragment extends Fragment {
 
         radioController.setChecked(true);
 
+        // update spinner when type changes
         typeGroup.setOnCheckedChangeListener((group, checkedId) -> {
             LogType selectedType = (checkedId == R.id.radioController) ? LogType.CONTROLLER : LogType.RESCUE;
             updateSpinner(spinnerInhalerName, selectedType);
@@ -116,7 +144,7 @@ public class InhalerLogPromptFragment extends Fragment {
                     String selectedInhaler = null;
                     if (spinnerInhalerName.getSelectedItem() != null) {
                         String selection = spinnerInhalerName.getSelectedItem().toString();
-                        // check if it's the empty placeholder
+                        // Check if it's the empty placeholder
                         if (!selection.equals("No inhalers of this type in Inventory.")) {
                             selectedInhaler = selection;
                         }
@@ -172,7 +200,7 @@ public class InhalerLogPromptFragment extends Fragment {
 
                         //path can be changed
                         DatabaseReference typeRef = logReference.child("rescue")
-                                .child(TEMP_ID);  // hardcoded for testing
+                                .child(TEMP_ID);  // hardcoded for testing;
                         String key = typeRef.push().getKey();
                         entry.id = key;
                         if (key != null) {
@@ -181,7 +209,8 @@ public class InhalerLogPromptFragment extends Fragment {
                         
                         updateInventoryDose(selectedInhaler, dose, "rescue");
                     }
-
+                    
+                    // after saving, proceed to the post check screen
                     navigateToPostCheck();
                 })
                 .setNegativeButton("Cancel", null)
@@ -228,11 +257,8 @@ public class InhalerLogPromptFragment extends Fragment {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     InventoryItem item = child.getValue(InventoryItem.class);
                     if (item != null) {
-                        // update remaining doses
                         item.remainingDoses -= doseTaken;
                         if (item.remainingDoses < 0) item.remainingDoses = 0;
-
-                        // recalculate percentage
                         item.updatePercentLeft();
 
                         // update firebase

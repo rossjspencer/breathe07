@@ -18,6 +18,8 @@ public class InhalerPreCheckFragment extends Fragment {
 
     private boolean isBreathingSelected = false;
     private boolean isComparisonSelected = false;
+    private boolean isSpacerSelected = false;
+    private boolean useSpacer = false;
 
     @Nullable
     @Override
@@ -26,6 +28,7 @@ public class InhalerPreCheckFragment extends Fragment {
 
         RadioGroup radioGroupBreathing = view.findViewById(R.id.radioGroupBreathing);
         RadioGroup radioGroupComparison = view.findViewById(R.id.radioGroupComparison);
+        RadioGroup radioGroupSpacer = view.findViewById(R.id.radioGroupSpacer);
         Button nextButton = view.findViewById(R.id.preCheckNextButton);
 
         radioGroupBreathing.setOnCheckedChangeListener((group, checkedId) -> {
@@ -38,12 +41,25 @@ public class InhalerPreCheckFragment extends Fragment {
             checkEnableButton(nextButton);
         });
 
+        radioGroupSpacer.setOnCheckedChangeListener((group, checkedId) -> {
+            isSpacerSelected = true;
+            useSpacer = (checkedId == R.id.radioSpacerYes);
+            checkEnableButton(nextButton);
+        });
+
         nextButton.setOnClickListener(v -> {
-            // navigate to the first step of the guide
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                     android.R.anim.fade_in, android.R.anim.fade_out);
-            transaction.replace(R.id.fragment_container, new InhalerStep1Fragment());
+            
+            if (useSpacer) {
+                // go to spacer step 1
+                transaction.replace(R.id.fragment_container, new SpacerStep1Fragment()); 
+            } else {
+                // go to standard step 1
+                transaction.replace(R.id.fragment_container, new InhalerStep1Fragment());
+            }
+            
             transaction.addToBackStack(null);
             transaction.commit();
         });
@@ -52,6 +68,6 @@ public class InhalerPreCheckFragment extends Fragment {
     }
 
     private void checkEnableButton(Button button) {
-        button.setEnabled(isBreathingSelected && isComparisonSelected);
+        button.setEnabled(isBreathingSelected && isComparisonSelected && isSpacerSelected);
     }
 }

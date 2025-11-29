@@ -11,12 +11,6 @@ public class MedicineLog {
         this.rescueLogs = new ArrayList<RescueLogEntry>();
     }
 
-    public MedicineLog(ArrayList<ControllerLogEntry> controllerLogs,
-                           ArrayList<RescueLogEntry> rescueLogs){
-        this.controllerLogs = controllerLogs;
-        this.rescueLogs = rescueLogs;
-    }
-
     public ArrayList<ControllerLogEntry> getControllerLogs() {
         return controllerLogs;
     }
@@ -31,14 +25,6 @@ public class MedicineLog {
 
     protected void addEntry(RescueLogEntry entry) {
         rescueLogs.add(entry);
-    }
-
-    protected boolean entryExists(ControllerLogEntry entry) {
-        return controllerLogs.contains(entry);
-    }
-
-    protected boolean entryExists(RescueLogEntry entry) {
-        return rescueLogs.contains(entry);
     }
 
     public void removeEntry(MedicineLogEntry entry) {

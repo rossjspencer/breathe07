@@ -13,13 +13,13 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.b07.asthmaid.R;
 
-public class InhalerStep1Fragment extends Fragment {
+public class SpacerStep1Fragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_inhaler_step1, container, false);
-        
+        View view = inflater.inflate(R.layout.fragment_spacer_step1, container, false);
+
         Button nextButton = view.findViewById(R.id.step1NextButton);
 
         nextButton.setOnClickListener(v -> {
