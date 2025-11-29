@@ -28,6 +28,18 @@
             android:visibility="gone" />
 
         <TextView
+            android:id="@+id/triageBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New triage update — tap to view"
+            android:textStyle="bold"
+            android:padding="12dp"
+            android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+
+        <TextView
             android:id="@+id/tvDashboardHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -248,6 +260,17 @@
                 android:backgroundTint="#1565C0"
                 android:textColor="@android:color/white"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_set_pb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Set Personal Best (PB)"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#00897B" />
+
 
         <Button
             android:id="@+id/btnGenerateReport"

@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.example.smartair.R4.pef.ParentSetPbActivity;
+import com.google.firebase.database.ChildEventListener;
 
 public class ParentViewChildActivity extends AppCompatActivity {
 
@@ -44,6 +46,14 @@ public class ParentViewChildActivity extends AppCompatActivity {
     private User childProfile;
     private int selectedRangeDays = 7;
     private AlertHelper alertHelper;
+
+    private Button btnSetPb;
+
+    /* Triage Banner
+    private TextView triageBanner;
+    private ChildEventListener triageListener;
+    private static final String PREFS_TRIAGE_SEEN = "triage_seen_prefs";
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +93,12 @@ public class ParentViewChildActivity extends AppCompatActivity {
         btnQuickController = findViewById(R.id.btnQuickController);
         btnViewReport = findViewById(R.id.btnViewReport);
         btnExpandTrend = findViewById(R.id.btnExpandTrend);
+        btnSetPb = findViewById(R.id.btn_set_pb);
         cardZone = findViewById(R.id.cardZone);
         cardRescue = findViewById(R.id.cardRescue);
         cardTrend = findViewById(R.id.cardTrend);
         cardAdherence = findViewById(R.id.cardAdherence);
+        //triageBanner = findViewById(R.id.triageBanner);
     }
 
     private void wireActions() {
@@ -128,6 +140,13 @@ public class ParentViewChildActivity extends AppCompatActivity {
             selectedRangeDays = selectedRangeDays == 7 ? 30 : 7;
             refreshTrend();
         });
+
+        btnSetPb.setOnClickListener(v -> {
+            Intent i = new Intent(this, ParentSetPbActivity.class);
+            i.putExtra(ParentSetPbActivity.EXTRA_CHILD_ID, childId); // pass the child being viewed
+            startActivity(i);
+        });
+
     }
 
     private void openExistingReport() {
@@ -212,6 +231,89 @@ public class ParentViewChildActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
+    //TRIAGE BANNER
+    /*
+    private long getLastSeenTriageTs(String childId) {
+        return getSharedPreferences(PREFS_TRIAGE_SEEN, MODE_PRIVATE)
+                .getLong("lastSeenTs_" + childId, 0L);
+    }
+
+    private void setLastSeenTriageTs(String childId, long ts) {
+        getSharedPreferences(PREFS_TRIAGE_SEEN, MODE_PRIVATE)
+                .edit()
+                .putLong("lastSeenTs_" + childId, ts)
+                .apply();
+    }
+
+    private void showTriageBanner() {
+        if (triageBanner.getVisibility() != View.VISIBLE) {
+            triageBanner.setVisibility(View.VISIBLE);
+            triageBanner.setOnClickListener(v -> {
+                // Mark latest as seen, then hide
+                mDatabase.child("users").child(childId).child("triageIncidents")
+                        .orderByChild("timestamp").limitToLast(1)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                long maxTs = 0L;
+                                for (DataSnapshot ds : snapshot.getChildren()) {
+                                    Long ts = ds.child("timestamp").getValue(Long.class);
+                                    if (ts != null && ts > maxTs) maxTs = ts;
+                                }
+                                if (maxTs > 0L) setLastSeenTriageTs(childId, maxTs);
+                                triageBanner.setVisibility(View.GONE);
+                            }
+                            @Override public void onCancelled(@NonNull DatabaseError error) {}
+                        });
+            });
+        }
+    }
+
+    private void startTriageListener() {
+        if (triageListener != null) return;
+
+        DatabaseReference triageRef = mDatabase.child("users")
+                .child(childId)
+                .child("triageIncidents");
+
+        triageListener = new ChildEventListener() {
+            @Override public void onChildAdded(@NonNull DataSnapshot snap, String prev) {
+                Long ts = snap.child("timestamp").getValue(Long.class);
+                if (ts == null) return;
+                if (ts > getLastSeenTriageTs(childId)) {
+                    showTriageBanner();
+                }
+            }
+            @Override public void onChildChanged(@NonNull DataSnapshot s, String p) {}
+            @Override public void onChildRemoved(@NonNull DataSnapshot s) {}
+            @Override public void onChildMoved(@NonNull DataSnapshot s, String p) {}
+            @Override public void onCancelled(@NonNull DatabaseError e) {}
+        };
+
+        triageRef.addChildEventListener(triageListener);
+
+        // Also check most recent on entry, in case it arrived while screen wasn’t active
+        triageRef.orderByChild("timestamp").limitToLast(1)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            Long ts = ds.child("timestamp").getValue(Long.class);
+                            if (ts != null && ts > getLastSeenTriageTs(childId)) {
+                                showTriageBanner();
+                            }
+                        }
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
+
+    private void stopTriageListener() {
+        if (triageListener != null) {
+            mDatabase.child("users").child(childId).child("triageIncidents")
+                    .removeEventListener(triageListener);
+            triageListener = null;
+        }
+    }
+    */
 
     private void updateZoneTile(int score) {
         tvZoneValue.setText(score + "%");
@@ -419,4 +521,20 @@ public class ParentViewChildActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
+
+    //Overrides for Triage Banner
+    /*
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startTriageListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopTriageListener();
+    }
+    */
+
 }
