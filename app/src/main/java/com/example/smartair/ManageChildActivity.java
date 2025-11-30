@@ -19,6 +19,7 @@ import java.util.Map;
 public class ManageChildActivity extends AppCompatActivity {
 
     private EditText etFirst, etLast, etDob, etUser, etPass, etNotes;
+    private EditText etPlannedDoses, etPlannedDays;
     private Button btnSave, btnDelete;
     private DatabaseReference mDatabase;
     private String childId;
@@ -43,6 +44,8 @@ public class ManageChildActivity extends AppCompatActivity {
         etUser = findViewById(R.id.edit_username);
         etPass = findViewById(R.id.edit_password);
         etNotes = findViewById(R.id.edit_notes);
+        etPlannedDoses = findViewById(R.id.edit_planned_doses);
+        etPlannedDays = findViewById(R.id.edit_planned_days);
         btnSave = findViewById(R.id.btn_save_changes);
         btnDelete = findViewById(R.id.btn_delete_child);
 
@@ -66,6 +69,8 @@ public class ManageChildActivity extends AppCompatActivity {
                     etPass.setText(child.password);
                     if (child.dateOfBirth != null) etDob.setText(child.dateOfBirth);
                     if (child.notes != null) etNotes.setText(child.notes);
+                    etPlannedDoses.setText(String.valueOf(child.plannedControllerPerDay));
+                    etPlannedDays.setText(String.valueOf(child.plannedControllerDaysPerWeek));
                 }
             }
             @Override
@@ -85,12 +90,23 @@ public class ManageChildActivity extends AppCompatActivity {
         updates.put("password", etPass.getText().toString().trim());
         updates.put("dateOfBirth", etDob.getText().toString().trim());
         updates.put("notes", etNotes.getText().toString().trim());
+        updates.put("plannedControllerPerDay", parseOrDefault(etPlannedDoses.getText().toString().trim(), 1));
+        updates.put("plannedControllerDaysPerWeek", parseOrDefault(etPlannedDays.getText().toString().trim(), 7));
 
         mDatabase.child("users").child(childId).updateChildren(updates)
                 .addOnSuccessListener(v -> {
                     Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
                     finish();
                 });
+    }
+
+    private int parseOrDefault(String raw, int fallback) {
+        try {
+            int val = Integer.parseInt(raw);
+            return val > 0 ? val : fallback;
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
     }
 
     // --- Delete Child from Existence ---

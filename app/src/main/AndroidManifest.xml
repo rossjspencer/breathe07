@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.smartair">
+
+    <!-- Android 13+ runtime permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -13,6 +17,9 @@
         android:theme="@style/Theme.SmartAir">
         <activity android:name=".HistoryActivity" />
         <activity android:name=".DailyLogActivity" />
+
+        <activity android:name=".ParentOnboardingActivity" />
+        <activity android:name=".ProviderOnboardingActivity" />
         <activity android:name=".ShareProviderActivity" android:exported="false" />
         <activity android:name=".InviteProviderActivity" android:exported="false" />
         <activity android:name=".ManageChildActivity" android:exported="false" />
@@ -20,22 +27,26 @@
         <activity android:name=".AddChildActivity" android:exported="false" />
         <activity android:name=".ProviderViewPatientActivity" android:exported="false" />
         <activity android:name=".ParentHomeActivity" />
+        <activity android:name=".ParentViewChildActivity" android:exported="false" />
         <activity android:name=".ProviderHomeActivity" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
+        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".ProviderReportActivity" android:exported="false" />
+        <activity android:name=".PdfPreviewActivity" android:exported="false" />
+        <activity android:name=".TrendDetailActivity" android:exported="false" />
+        <activity android:name=".R4.pef.PefEntryActivity"/>
+        <activity android:name=".R4.triage.TriageActivity"/>
+        <activity android:name=".R4.pef.ParentSetPbActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

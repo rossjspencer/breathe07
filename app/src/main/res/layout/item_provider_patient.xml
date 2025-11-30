@@ -23,6 +23,8 @@ android:layout_margin="8dp">
         android:id="@+id/btnViewRecords"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View Data"/>
+        android:text="View Data"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#1565C0"/>
 </LinearLayout>
 </androidx.cardview.widget.CardView>

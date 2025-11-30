@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="#DCE8D8">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/pef_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter PEF"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+
+    <!-- PEF value -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PEF value"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/pef_edittext"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:hint="Today's PEF"
+        android:inputType="number"
+        android:padding="12dp"
+        android:background="@drawable/rounded_input"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Pre/Post medication -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Is this before or after medicine?"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/pre_post_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/radio_pre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pre-med"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radio_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Post-med"
+            android:layout_marginStart="16dp" />
+    </RadioGroup>
+
+    <!-- Save button -->
+    <Button
+        android:id="@+id/save_pef_button"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Save PEF"
+        android:textColor="#000000"
+        android:background="@drawable/rounded_button" />
+
+</LinearLayout>

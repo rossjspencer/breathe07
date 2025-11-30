@@ -9,11 +9,9 @@ public class SymptomLog {
     public int severity;
     public String activityLimitation;
     public String notes;
-    public String loggedBy; // "Parent" or "Child - [Name]"
+    public String loggedBy;
 
-    public SymptomLog() {
-        // Required empty constructor for Firebase
-    }
+    public SymptomLog() {}
 
     public SymptomLog(long timestamp, List<String> symptoms, List<String> triggers, int severity, String activityLimitation, String notes, String loggedBy) {
         this.timestamp = timestamp;

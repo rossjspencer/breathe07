@@ -4,14 +4,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
+import android.content.Intent;
+import com.example.smartair.R4.pef.PefEntryActivity;
+import com.example.smartair.R4.triage.TriageActivity;
 
 public class ChildHomeActivity extends AppCompatActivity {
 
@@ -26,23 +27,26 @@ public class ChildHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child_home);
 
-        // Bind Views
         tvCurrentZone = findViewById(R.id.tvCurrentZone);
         tvZoneDescription = findViewById(R.id.tvZoneDescription);
         Button btnLogPef = findViewById(R.id.btnLogPef);
-        
-        // New Button: Daily Triggers/Symptoms Log
+
         Button btnLogSymptoms = findViewById(R.id.btnLogSymptoms);
-        
-        // New Button: View History
         Button btnViewHistory = findViewById(R.id.btnViewHistory);
+
+        // Triage button (keep)
+        Button triageButton = findViewById(R.id.triage_button);
+        triageButton.setOnClickListener(v -> {
+            Intent i = new Intent(ChildHomeActivity.this, TriageActivity.class);
+            i.putExtra("childId", currentChildId);
+            startActivity(i);
+        });
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         if (getIntent().hasExtra("CHILD_ID")) {
             currentChildId = getIntent().getStringExtra("CHILD_ID");
-        }
-        else if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        } else if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             currentChildId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
 
@@ -53,8 +57,13 @@ public class ChildHomeActivity extends AppCompatActivity {
             finish();
         }
 
-        btnLogPef.setOnClickListener(v -> showLogDialog());
-        
+        // Launch R4 PEF screen instead of dialog
+        btnLogPef.setOnClickListener(v -> {
+            Intent i = new Intent(ChildHomeActivity.this, PefEntryActivity.class);
+            i.putExtra("childId", currentChildId);
+            startActivity(i);
+        });
+
         // Wire up log symptoms button
         btnLogSymptoms.setOnClickListener(v -> {
             Intent intent = new Intent(ChildHomeActivity.this, DailyLogActivity.class);
@@ -63,7 +72,7 @@ public class ChildHomeActivity extends AppCompatActivity {
             intent.putExtra("CHILD_NAME", childName);
             startActivity(intent);
         });
-        
+
         // Wire up history button
         btnViewHistory.setOnClickListener(v -> {
             Intent intent = new Intent(ChildHomeActivity.this, HistoryActivity.class);
@@ -75,32 +84,24 @@ public class ChildHomeActivity extends AppCompatActivity {
 
     private void loadChildData() {
         mDatabase.child("users").child(currentChildId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     if (snapshot.hasChild("firstName")) {
                         childName = snapshot.child("firstName").getValue(String.class);
                     }
-                    
-                    if (snapshot.hasChild("personalBest")) {
-                        Integer pb = snapshot.child("personalBest").getValue(Integer.class);
-                        if (pb != null && pb > 0) personalBest = pb;
-                    }
+                    Integer pb = snapshot.child("personalBest").getValue(Integer.class);
+                    if (pb != null && pb > 0) personalBest = pb;
 
-                    if (snapshot.hasChild("asthmaScore")) {
-                        Integer score = snapshot.child("asthmaScore").getValue(Integer.class);
-                        updateZoneUI(score != null ? score : 100);
-                    }
+                    Integer score = snapshot.child("asthmaScore").getValue(Integer.class);
+                    updateZoneUI(score != null ? score : 100);
                 }
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
     private void updateZoneUI(int score) {
         tvCurrentZone.setText(score + "%");
-
         if (score >= 80) {
             tvCurrentZone.setTextColor(Color.parseColor("#4CAF50"));
             tvZoneDescription.setText("Green Zone (All Good)");
@@ -114,37 +115,5 @@ public class ChildHomeActivity extends AppCompatActivity {
             tvZoneDescription.setText("Red Zone (Danger)");
             tvZoneDescription.setTextColor(Color.parseColor("#F44336"));
         }
-    }
-    private void showLogDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Log Peak Flow");
-        builder.setMessage("Enter value (e.g. 350):");
-
-        final EditText input = new EditText(this);
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
-
-        builder.setPositiveButton("Log", (dialog, which) -> {
-            String val = input.getText().toString().trim();
-            if (!val.isEmpty()) {
-                try {
-                    int value = Integer.parseInt(val);
-                    calculateAndSaveScore(value);
-                } catch (NumberFormatException e) {
-                    Toast.makeText(this, "Invalid Number", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
-    }
-
-    private void calculateAndSaveScore(int currentPef) {
-        int asthmaScore = (int) (((float) currentPef / personalBest) * 100);
-        if (asthmaScore > 100) asthmaScore = 100;
-
-        mDatabase.child("users").child(currentChildId).child("asthmaScore").setValue(asthmaScore)
-                .addOnSuccessListener(v -> Toast.makeText(this, "Logged successfully!", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

@@ -10,16 +10,27 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 import java.util.ArrayList;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 
 public class ParentHomeActivity extends AppCompatActivity {
 
+    // Your branch
+    private Button logoutBtn;
+
+    // Main branch
     private DatabaseReference mDatabase;
     private String currentParentId;
 
-    // List Components
+    // Child List
     private RecyclerView recyclerView;
     private ChildAdapter adapter;
     private ArrayList<User> childList;
@@ -29,35 +40,44 @@ public class ParentHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent_home);
 
+        // 🔒 Security: Must be logged in
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
+
+        // Logout button (your branch)
+        logoutBtn = findViewById(R.id.logout_button);
+        logoutBtn.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(ParentHomeActivity.this, MainActivity.class));
+            finish();
+        });
+
+        // Main branch database logic
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        // Safety check: if parent isn't logged in, don't crash
+        // Get parent UID
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             currentParentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
 
-        // 1. Setup List
+        // Setup child list (main branch)
         recyclerView = findViewById(R.id.rvLinkedChildren);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         childList = new ArrayList<>();
         adapter = new ChildAdapter(childList);
         recyclerView.setAdapter(adapter);
 
-        // 2. Setup Button (Now Redirects to AddChildActivity)
+        // Add child button
         Button btnLink = findViewById(R.id.btnLinkChild);
-
-        // Optional: Update text programmatically to reflect new behavior
         btnLink.setText("+ Register New Child");
 
-        btnLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // OLD WAY: showLinkChildDialog();
-                // NEW WAY: Open the registration screen
-                startActivity(new Intent(ParentHomeActivity.this, AddChildActivity.class));
-            }
-        });
+        btnLink.setOnClickListener(v ->
+                startActivity(new Intent(ParentHomeActivity.this, AddChildActivity.class)));
 
+        // Load children
         // Setup Log Symptoms Button
         Button logButton = findViewById(R.id.log_symptoms_button);
         logButton.setText("Daily Triggers/Symptoms Log"); // Rename
@@ -74,7 +94,6 @@ public class ParentHomeActivity extends AppCompatActivity {
             Toast.makeText(this, "No linked children found.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (childList.size() == 1) {
             // Only one child, launch directly
             launchLogForChild(childList.get(0));
@@ -107,59 +126,64 @@ public class ParentHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // Load list of child IDs linked to parent
     private void loadLinkedChildren() {
         mDatabase.child("users").child(currentParentId).child("linkedChildren")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        childList.clear(); // Clear list to prevent duplicates
+                        childList.clear();
+
                         for (DataSnapshot data : snapshot.getChildren()) {
                             String childUid = data.getKey();
                             fetchChildDetails(childUid);
                         }
-                        // If no children, notify adapter to clear view
+
                         if (!snapshot.exists()) {
                             adapter.notifyDataSetChanged();
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 
-    // REPLACE THE OLD fetchChildDetails WITH THIS ONE
+    // Load child details and update RecyclerView
     private void fetchChildDetails(String childUid) {
-        // Changed from addListenerForSingleValueEvent to addValueEventListener
-        mDatabase.child("users").child(childUid).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User updatedChild = snapshot.getValue(User.class);
-                if (updatedChild != null) {
-                    updatedChild.userId = childUid;
+        mDatabase.child("users").child(childUid)
+                .addValueEventListener(new ValueEventListener() {
 
-                    // LOGIC: Check if child is already in the list
-                    int index = -1;
-                    for (int i = 0; i < childList.size(); i++) {
-                        if (childList.get(i).userId.equals(childUid)) {
-                            index = i;
-                            break;
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User updatedChild = snapshot.getValue(User.class);
+
+                        if (updatedChild != null) {
+                            updatedChild.userId = childUid;
+
+                            int index = -1;
+                            for (int i = 0; i < childList.size(); i++) {
+                                if (childList.get(i).userId.equals(childUid)) {
+                                    index = i;
+                                    break;
+                                }
+                            }
+
+                            if (index != -1) {
+                                // Update existing
+                                childList.set(index, updatedChild);
+                                adapter.notifyItemChanged(index);
+                            } else {
+                                // Add new child
+                                childList.add(updatedChild);
+                                adapter.notifyDataSetChanged();
+                            }
                         }
                     }
 
-                    if (index != -1) {
-                        // Child exists -> Update their data
-                        childList.set(index, updatedChild);
-                        adapter.notifyItemChanged(index);
-                    } else {
-                        // New child -> Add to list
-                        childList.add(updatedChild);
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 }
+

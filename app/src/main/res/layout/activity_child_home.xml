@@ -64,8 +64,9 @@
         android:layout_height="60dp"
         android:text="Log Peak Flow"
         android:textSize="18sp"
-        android:backgroundTint="#2196F3"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="10dp"
+        android:elevation="4dp"
+        android:backgroundTint="#2196F3" />
 
     <Button
         android:id="@+id/btnLogSymptoms"
@@ -75,7 +76,7 @@
         android:textSize="18sp"
         android:backgroundTint="#FF5722"
         android:layout_marginBottom="16dp"/>
-        
+
     <Button
         android:id="@+id/btnViewHistory"
         android:layout_width="match_parent"
@@ -83,5 +84,16 @@
         android:text="View History"
         android:textSize="18sp"
         android:backgroundTint="#673AB7" />
+
+    <Button
+        android:id="@+id/triage_button"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:backgroundTint="#2196F3"
+        android:text="Triage"
+        android:layout_marginTop="10dp"
+        android:elevation="4dp"
+        android:textSize="18sp" />
+
 
 </LinearLayout>

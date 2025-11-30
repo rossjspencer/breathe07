@@ -1,22 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:gravity="center"
-android:orientation="vertical">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-<TextView
-    android:id="@+id/tvChildTitle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Child Dashboard (Placeholder)"
-    android:textSize="24sp"
-    android:textStyle="bold" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:text="Future: Charts and Logs will go here."/>
+        <TextView
+            android:id="@+id/tvChildTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Child Dashboard"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvSharingTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Shared with Provider"
+            android:textColor="#2E7D32"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/triageBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New triage update — tap to view"
+            android:textStyle="bold"
+            android:padding="12dp"
+            android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+
+        <TextView
+            android:id="@+id/tvDashboardHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="At-a-glance tiles update live from the child dashboard."
+            android:textColor="#616161" />
+
+        <GridLayout
+            android:id="@+id/gridTiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardZone"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_margin="8dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today's Zone"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvZoneValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="--"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvZoneSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Waiting for data" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardRescue"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_margin="8dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Last Rescue Time"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvLastRescue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="No rescue logged"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tvWeeklyCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Weekly count: 0" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardTrend"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_margin="8dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Trend Snippet"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnRange7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:minWidth="0dp"
+                            android:text="7d"
+                            android:textSize="12sp"
+                            android:textColor="@android:color/black"
+                            android:backgroundTint="#E0E0E0" />
+                        <Button
+                            android:id="@+id/btnRange30"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:minWidth="0dp"
+                            android:text="30d"
+                            android:textSize="12sp"
+                            android:textColor="@android:color/black"
+                            android:backgroundTint="#E0E0E0" />
+                    </LinearLayout>
+
+                    <com.example.smartair.TrendChartView
+                        android:id="@+id/trendChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:background="#F5F5F5" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAdherence"
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_margin="8dp"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Controller Adherence"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvAdherenceValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="--%"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvAdherencePlan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Plan: 1x daily, 7 days/week" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </GridLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnQuickRescue"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Log Rescue"
+                android:backgroundTint="#C62828"
+                android:textColor="@android:color/white"/>
+
+            <Button
+                android:id="@+id/btnQuickController"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Log Controller"
+                android:backgroundTint="#1565C0"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_set_pb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Set Personal Best (PB)"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#00897B" />
+
+
+        <Button
+            android:id="@+id/btnGenerateReport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Generate Provider Report"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#1565C0" />
+
+        <Button
+            android:id="@+id/btnViewReport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="View Last Report"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:backgroundTint="#E0E0E0" />
+
+        <Button
+            android:id="@+id/btnExpandTrend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Trend Charts"
+            android:textColor="@android:color/black"
+            android:backgroundTint="#E0E0E0" />
+
+        <TextView
+            android:id="@+id/tvReportHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Exports respect provider sharing toggles and uses the chart snippet above in the PDF."
+            android:textColor="#616161" />
+    </LinearLayout>
+</ScrollView>

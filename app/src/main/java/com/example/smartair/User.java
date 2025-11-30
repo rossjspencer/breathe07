@@ -14,6 +14,11 @@ public class User {
 
     public String password;
     public String role;
+
+    // ⭐ From your branch (keep this — important for onboarding flow)
+    public boolean onboardingComplete = false;
+
+    // ⭐ From main branch — keep all additional fields
     public String dateOfBirth;
     public String notes;
 
@@ -24,6 +29,11 @@ public class User {
     // Sharing Settings Node (nested object)
     public Map<String, Boolean> sharingSettings = new HashMap<>();
 
+    // R6: Planner & adherence helpers
+    public int plannedControllerPerDay = 1; // number of doses expected per day
+    public int plannedControllerDaysPerWeek = 7; // how many days each week the plan expects
+    public long lastRescueTimestamp = 0; // cached for quick dashboard tile lookup
+
     public User() {}
 
     // Updated constructor to handle generic creation
@@ -31,5 +41,9 @@ public class User {
         this.userId = userId;
         this.role = role;
         this.email = email;
+
+        // Your feature preserved: new users start with onboarding incomplete
+        this.onboardingComplete = false;
     }
 }
+
