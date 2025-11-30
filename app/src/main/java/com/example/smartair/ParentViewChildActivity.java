@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -37,6 +38,10 @@ public class ParentViewChildActivity extends AppCompatActivity {
 
     private TextView tvTitle, tvSharingTag, tvZoneValue, tvZoneSubtitle, tvLastRescue, tvWeeklyCount, tvAdherenceValue, tvAdherencePlan;
     private View cardZone, cardRescue, cardTrend, cardAdherence;
+
+    // NEW: Share Icons
+    private ImageView ivShareZone, ivShareRescue, ivShareTrend, ivShareAdherence;
+
     private TrendChartView trendChartView;
     private Button btnRange7, btnRange30, btnGenerateReport, btnQuickRescue, btnQuickController, btnViewReport, btnExpandTrend;
     private Map<String, Boolean> sharingSettings = new HashMap<>();
@@ -49,11 +54,11 @@ public class ParentViewChildActivity extends AppCompatActivity {
 
     private Button btnSetPb;
 
-    /* Triage Banner
-    private TextView triageBanner;
-    private ChildEventListener triageListener;
-    private static final String PREFS_TRIAGE_SEEN = "triage_seen_prefs";
-    */
+//    /* Triage Banner */
+//    private TextView triageBanner;
+//    private ChildEventListener triageListener;
+//    private static final String PREFS_TRIAGE_SEEN = "triage_seen_prefs";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,11 +99,20 @@ public class ParentViewChildActivity extends AppCompatActivity {
         btnViewReport = findViewById(R.id.btnViewReport);
         btnExpandTrend = findViewById(R.id.btnExpandTrend);
         btnSetPb = findViewById(R.id.btn_set_pb);
+
+        // Tiles
         cardZone = findViewById(R.id.cardZone);
         cardRescue = findViewById(R.id.cardRescue);
         cardTrend = findViewById(R.id.cardTrend);
         cardAdherence = findViewById(R.id.cardAdherence);
-        //triageBanner = findViewById(R.id.triageBanner);
+
+        // Share Icons
+        ivShareZone = findViewById(R.id.ivShareZone);
+        ivShareRescue = findViewById(R.id.ivShareRescue);
+        ivShareTrend = findViewById(R.id.ivShareTrend);
+        ivShareAdherence = findViewById(R.id.ivShareAdherence);
+
+//        triageBanner = findViewById(R.id.triageBanner);
     }
 
     private void wireActions() {
@@ -190,7 +204,19 @@ public class ParentViewChildActivity extends AppCompatActivity {
                             Boolean val = child.getValue(Boolean.class);
                             sharingSettings.put(child.getKey(), val != null && val);
                         }
-                        boolean isShared = sharingSettings.getOrDefault("isShared", false);
+
+                        boolean sharePef = sharingSettings.getOrDefault("sharePef", false);
+                        boolean shareRescue = sharingSettings.getOrDefault("shareRescue", false);
+                        boolean shareCharts = sharingSettings.getOrDefault("shareCharts", false);
+                        boolean shareController = sharingSettings.getOrDefault("shareController", false);
+
+                        ivShareZone.setVisibility(sharePef ? View.VISIBLE : View.GONE);
+                        ivShareRescue.setVisibility(shareRescue ? View.VISIBLE : View.GONE);
+                        ivShareTrend.setVisibility(shareCharts ? View.VISIBLE : View.GONE);
+                        ivShareAdherence.setVisibility(shareController ? View.VISIBLE : View.GONE);
+
+                        // Keep main tag if anything is shared
+                        boolean isShared = sharePef || shareRescue || shareCharts || shareController;
                         tvSharingTag.setVisibility(isShared ? View.VISIBLE : View.GONE);
                     }
                     @Override
@@ -231,7 +257,8 @@ public class ParentViewChildActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
-    //TRIAGE BANNER
+
+    /* TRIAGE BANNER */
     /*
     private long getLastSeenTriageTs(String childId) {
         return getSharedPreferences(PREFS_TRIAGE_SEEN, MODE_PRIVATE)
@@ -463,13 +490,9 @@ public class ParentViewChildActivity extends AppCompatActivity {
 
     private void checkAlerts() {
         if (childProfile == null) return;
-
-        // Red zone alert
         if (childProfile.asthmaScore < 50) {
             alertHelper.maybeNotify("redZone", "Red-zone day", "Child is currently in the Red Zone. Review action plan.");
         }
-
-        // Rapid rescue repeats: >=3 within 3 hours
         int rapidCount = 0;
         long now = System.currentTimeMillis();
         for (int i = rescueLogs.size() - 1; i >= 0; i--) {
@@ -479,13 +502,9 @@ public class ParentViewChildActivity extends AppCompatActivity {
         if (rapidCount >= 3) {
             alertHelper.maybeNotify("rapidRescue", "Rapid rescue repeats", "3+ rescue uses in 3 hours.");
         }
-
-        // Worse after dose flag
         if (!rescueLogs.isEmpty() && rescueLogs.get(rescueLogs.size() - 1).worseAfterDose) {
             alertHelper.maybeNotify("worseAfterDose", "Worse after dose", "Child reported feeling worse after rescue.");
         }
-
-        // Inventory low/expired
         mDatabase.child("users").child(childId).child("inventory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -504,7 +523,6 @@ public class ParentViewChildActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        // Triage escalation listener
         mDatabase.child("users").child(childId).child("triageIncidents")
                 .limitToLast(1)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -522,7 +540,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
                 });
     }
 
-    //Overrides for Triage Banner
+    /* Restored Overrides for Triage Listener */
     /*
     @Override
     protected void onStart() {
@@ -536,5 +554,4 @@ public class ParentViewChildActivity extends AppCompatActivity {
         stopTriageListener();
     }
     */
-
 }
