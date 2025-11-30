@@ -1,5 +1,6 @@
 package com.example.smartair;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class ChildHomeActivity extends AppCompatActivity {
     private TextView tvCurrentZone, tvZoneDescription;
     private DatabaseReference mDatabase;
     private String currentChildId;
+    private String childName = "";
     private int personalBest = 400;
 
     @Override
@@ -28,6 +30,9 @@ public class ChildHomeActivity extends AppCompatActivity {
         tvCurrentZone = findViewById(R.id.tvCurrentZone);
         tvZoneDescription = findViewById(R.id.tvZoneDescription);
         Button btnLogPef = findViewById(R.id.btnLogPef);
+
+        Button btnLogSymptoms = findViewById(R.id.btnLogSymptoms);
+        Button btnViewHistory = findViewById(R.id.btnViewHistory);
 
         // Triage button (keep)
         Button triageButton = findViewById(R.id.triage_button);
@@ -58,12 +63,32 @@ public class ChildHomeActivity extends AppCompatActivity {
             i.putExtra("childId", currentChildId);
             startActivity(i);
         });
+
+        // Wire up log symptoms button
+        btnLogSymptoms.setOnClickListener(v -> {
+            Intent intent = new Intent(ChildHomeActivity.this, DailyLogActivity.class);
+            intent.putExtra("CHILD_ID", currentChildId);
+            intent.putExtra("LOGGED_BY_ROLE", "Child");
+            intent.putExtra("CHILD_NAME", childName);
+            startActivity(intent);
+        });
+
+        // Wire up history button
+        btnViewHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(ChildHomeActivity.this, HistoryActivity.class);
+            intent.putExtra("CHILD_ID", currentChildId);
+            intent.putExtra("CHILD_NAME", childName);
+            startActivity(intent);
+        });
     }
 
     private void loadChildData() {
         mDatabase.child("users").child(currentChildId).addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    if (snapshot.hasChild("firstName")) {
+                        childName = snapshot.child("firstName").getValue(String.class);
+                    }
                     Integer pb = snapshot.child("personalBest").getValue(Integer.class);
                     if (pb != null && pb > 0) personalBest = pb;
 

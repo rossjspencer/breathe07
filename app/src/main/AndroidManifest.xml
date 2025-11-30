@@ -15,6 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartAir">
+        <activity android:name=".HistoryActivity" />
+        <activity android:name=".DailyLogActivity" />
 
         <activity android:name=".ParentOnboardingActivity" />
         <activity android:name=".ProviderOnboardingActivity" />

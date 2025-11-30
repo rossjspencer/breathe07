@@ -4,20 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
+import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.*;
+import java.util.ArrayList;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 
 public class ParentHomeActivity extends AppCompatActivity {
 
@@ -76,9 +78,52 @@ public class ParentHomeActivity extends AppCompatActivity {
                 startActivity(new Intent(ParentHomeActivity.this, AddChildActivity.class)));
 
         // Load children
+        // Setup Log Symptoms Button
+        Button logButton = findViewById(R.id.log_symptoms_button);
+        logButton.setText("Daily Triggers/Symptoms Log"); // Rename
+        logButton.setOnClickListener(v -> handleLogButtonClick());
+
+        // 3. Load Data
         if (currentParentId != null) {
             loadLinkedChildren();
         }
+    }
+
+    private void handleLogButtonClick() {
+        if (childList.isEmpty()) {
+            Toast.makeText(this, "No linked children found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (childList.size() == 1) {
+            // Only one child, launch directly
+            launchLogForChild(childList.get(0));
+        } else {
+            // Multiple children, show selection dialog
+            showChildSelectionDialog();
+        }
+    }
+
+    private void showChildSelectionDialog() {
+        String[] childNames = new String[childList.size()];
+        for (int i = 0; i < childList.size(); i++) {
+            User child = childList.get(i);
+            childNames[i] = child.firstName + " " + (child.lastName != null ? child.lastName : "");
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Select Child to Log For")
+                .setItems(childNames, (dialog, which) -> {
+                    launchLogForChild(childList.get(which));
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void launchLogForChild(User child) {
+        Intent intent = new Intent(ParentHomeActivity.this, DailyLogActivity.class);
+        intent.putExtra("CHILD_ID", child.userId);
+        intent.putExtra("LOGGED_BY_ROLE", "Parent");
+        startActivity(intent);
     }
 
     // Load list of child IDs linked to parent

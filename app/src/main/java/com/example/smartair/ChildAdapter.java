@@ -87,6 +87,14 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
             context.startActivity(intent);
         });
 
+        // History: View Logs
+        holder.btnHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(context, HistoryActivity.class);
+            intent.putExtra("CHILD_ID", child.userId);
+            intent.putExtra("CHILD_NAME", child.firstName);
+            context.startActivity(intent);
+        });
+
         // Dashboard: open parent overview with R6 tiles and report tools
         holder.btnDashboard.setOnClickListener(v -> {
             Intent intent = new Intent(context, ParentViewChildActivity.class);
@@ -103,7 +111,7 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
     public static class ChildViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvStatus;
         ProgressBar progressBar;
-        Button btnManage, btnLoginAs, btnShare, btnInvite, btnDashboard;
+        Button btnManage, btnLoginAs, btnShare, btnInvite, btnDashboard, btnHistory;
 
         public ChildViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -116,6 +124,7 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
             btnLoginAs = itemView.findViewById(R.id.btnLoginAsChild);
             btnShare = itemView.findViewById(R.id.btnShareChild);
             btnInvite = itemView.findViewById(R.id.btnInviteProvider);
+            btnHistory = itemView.findViewById(R.id.btnViewHistory);
             btnDashboard = itemView.findViewById(R.id.btnViewDashboard);
         }
     }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:id="@+id/tvLogDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Oct 24, 2023 - 2:30 PM"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#333333"/>
+
+            <TextView
+                android:id="@+id/tvSeverity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Severity: 5/10"
+                android:textStyle="bold"
+                android:textColor="#FF9800"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvLoggedBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Logged by: Parent"
+            android:textSize="12sp"
+            android:textColor="#777777"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvSymptoms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Symptoms: Cough, Wheezing"
+            android:layout_marginBottom="2dp"
+            android:textSize="14sp"
+            android:textColor="#555555"/>
+
+        <TextView
+            android:id="@+id/tvTriggers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Triggers: Dust"
+            android:textSize="14sp"
+            android:textColor="#555555"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

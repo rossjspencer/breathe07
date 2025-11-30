@@ -69,6 +69,23 @@
         android:backgroundTint="#2196F3" />
 
     <Button
+        android:id="@+id/btnLogSymptoms"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Daily Triggers/Symptoms Log"
+        android:textSize="18sp"
+        android:backgroundTint="#FF5722"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnViewHistory"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="View History"
+        android:textSize="18sp"
+        android:backgroundTint="#673AB7" />
+
+    <Button
         android:id="@+id/triage_button"
         android:layout_width="match_parent"
         android:layout_height="60dp"
