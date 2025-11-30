@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rescue Trend"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <com.example.smartair.TrendChartView
+        android:id="@+id/detailTrendChart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"
+        android:background="#F5F5F5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+    <Button
+        android:id="@+id/btnDetail7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7d"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#E0E0E0" />
+
+    <Button
+        android:id="@+id/btnDetail30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="30d"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#E0E0E0" />
+    </LinearLayout>
+</LinearLayout>
