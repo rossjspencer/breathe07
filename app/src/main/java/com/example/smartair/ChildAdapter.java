@@ -12,6 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.example.smartair.r3.InventoryAlertService;
 import java.util.ArrayList;
 
 public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHolder> {
@@ -67,9 +69,14 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
         });
 
         // Log In: Impersonate Child / Go to Dashboard
+        // This simulates a child login by signing out the parent first.
         holder.btnLoginAs.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            context.stopService(new Intent(context, InventoryAlertService.class));
+            
             Intent intent = new Intent(context, ChildHomeActivity.class);
             intent.putExtra("CHILD_ID", child.userId);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack so they can't go back to parent
             context.startActivity(intent);
         });
 

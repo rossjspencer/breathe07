@@ -67,6 +67,10 @@ public class AddChildActivity extends AppCompatActivity {
                             // Link to Parent
                             mDatabase.child("users").child(currentParentId)
                                     .child("linkedChildren").child(newChildId).setValue(true);
+                            
+                            // Store creation date in guide_stats
+                            String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(new java.util.Date());
+                            mDatabase.getRoot().child("guide_stats").child(newChildId).child("accountCreationDate").setValue(today);
 
                             Toast.makeText(this, "Child Registered & Linked!", Toast.LENGTH_SHORT).show();
                             finish();

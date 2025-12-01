@@ -38,6 +38,25 @@
             android:textColor="@android:color/white"
             android:visibility="gone" />
 
+        <!-- Reminder Section -->
+        <LinearLayout
+            android:id="@+id/remindersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:padding="12dp"
+            android:background="#FFEBEE"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvReminderMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reminder"
+                android:textColor="#D32F2F"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvDashboardHint"
@@ -153,7 +172,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Trend Snippet"
+                        android:text="Rescue Trend Snippet"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -215,14 +234,50 @@
                         android:text="Controller Adherence"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvAdherenceValue"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="--%"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Weekly"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvAdherenceWeekly"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--%"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Monthly"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvAdherenceMonthly"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--%"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvAdherencePlan"
@@ -246,7 +301,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Log Rescue"
+                android:text="View Rescue Log"
                 android:backgroundTint="#C62828"
                 android:textColor="@android:color/white"/>
 
@@ -256,10 +311,30 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Log Controller"
+                android:text="View Controller Log"
                 android:backgroundTint="#1565C0"
                 android:textColor="@android:color/white"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnViewInventory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="View Inventory"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#FF9800" />
+
+        <Button
+            android:id="@+id/btnBadgeSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Badge Settings"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#7B1FA2" />
 
         <Button
             android:id="@+id/btn_set_pb"

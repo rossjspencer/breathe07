@@ -92,23 +92,38 @@ android:padding="24dp">
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
-        android:text="Controller Plan"
+        android:text="Controller Schedule (Doses/Day)"
         android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/edit_planned_doses"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Doses per day (e.g., 1 or 2)"
-        android:inputType="number" />
-
-    <EditText
-        android:id="@+id/edit_planned_days"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="Days per week (1-7)"
-        android:inputType="number" />
+    <!-- Daily Dose Inputs -->
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Sun" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_sun" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Mon" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_mon" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Tue" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_tue" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Wed" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_wed" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Thu" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_thu" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Fri" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_fri" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="Sat" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/edit_plan_sat" android:hint="0" android:inputType="number" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_save_changes"

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Badge Animation Overlay -->
+    <RelativeLayout
+        android:id="@+id/badgeOverlayLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="20dp">
+
+        <nl.dionsegijn.konfetti.xml.KonfettiView
+            android:id="@+id/mainKonfettiView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/mainOverlayBadgeImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/mainOverlayBadgeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mainOverlayBadgeImage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+    </RelativeLayout>
+
+</FrameLayout>

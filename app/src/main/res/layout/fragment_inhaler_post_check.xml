@@ -179,7 +179,9 @@
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"
             android:text="Next"
-            android:enabled="false"/>
+            android:enabled="false"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 </ScrollView>

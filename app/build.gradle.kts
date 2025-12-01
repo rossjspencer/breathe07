@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.b07.asthmaid"
+    namespace = "com.example.smartair"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.b07.asthmaid"
+        applicationId = "com.example.smartair"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

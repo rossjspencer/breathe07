@@ -38,6 +38,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="64dp"
-        android:text="Return to Home" />
+        android:text="Return to Home"
+        android:backgroundTint="#1565C0"
+        android:textColor="#FFFFFF" />
 
 </RelativeLayout>

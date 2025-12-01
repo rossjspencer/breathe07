@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -18,11 +17,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.b07.asthmaid.r3.BadgesFragment;
-import com.b07.asthmaid.r3.InhalerGuideFragment;
-import com.b07.asthmaid.r3.InventoryFragment;
-import com.b07.asthmaid.r3.MedicineLogFragment;
-import com.b07.asthmaid.r3.SettingsFragment;
+import com.example.smartair.R;
+import com.example.smartair.r3.BadgesFragment;
+import com.example.smartair.r3.InhalerGuideFragment;
+import com.example.smartair.r3.InventoryFragment;
+import com.example.smartair.r3.MedicineLogFragment;
+import com.example.smartair.r3.SettingsFragment;
 
 public class HomeFragment extends Fragment {
 
@@ -40,14 +40,31 @@ public class HomeFragment extends Fragment {
 
         checkAndRequestPermissions();
 
-        Button buttonMedicineLog = view.findViewById(R.id.buttonMedicineLog);
+        Button buttonRescueLog = view.findViewById(R.id.buttonRescueLog);
+        Button buttonControllerLog = view.findViewById(R.id.buttonControllerLog);
         Button buttonInventory = view.findViewById(R.id.buttonInventory);
         Button buttonGuide = view.findViewById(R.id.buttonGuide);
         Button buttonBadges = view.findViewById(R.id.buttonBadges);
         Button buttonSettings = view.findViewById(R.id.buttonSettings);
 
         buttonInventory.setOnClickListener(v -> loadFragment(new InventoryFragment()));
-        buttonMedicineLog.setOnClickListener(v -> loadFragment(new MedicineLogFragment()));
+        
+        buttonRescueLog.setOnClickListener(v -> {
+            MedicineLogFragment fragment = new MedicineLogFragment();
+            Bundle args = new Bundle();
+            args.putString(MedicineLogFragment.ARG_TYPE, "RESCUE");
+            fragment.setArguments(args);
+            loadFragment(fragment);
+        });
+
+        buttonControllerLog.setOnClickListener(v -> {
+            MedicineLogFragment fragment = new MedicineLogFragment();
+            Bundle args = new Bundle();
+            args.putString(MedicineLogFragment.ARG_TYPE, "CONTROLLER");
+            fragment.setArguments(args);
+            loadFragment(fragment);
+        });
+
         buttonGuide.setOnClickListener(v -> loadFragment(new InhalerGuideFragment()));
         buttonBadges.setOnClickListener(v -> loadFragment(new BadgesFragment()));
         

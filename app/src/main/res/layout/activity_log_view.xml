@@ -15,7 +15,9 @@
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back" />
+            android:text="Back"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <LinearLayout
@@ -28,14 +30,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="View Controller Logs" />
+            android:text="View Controller Logs"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="4dp" />
 
         <Button
             android:id="@+id/rescueButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="View Rescue Logs" />
+            android:text="View Rescue Logs"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="4dp" />
 
     </LinearLayout>
 
@@ -49,7 +57,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Add New Entry" />
+            android:text="Add New Entry"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="4dp" />
 
 
     </LinearLayout>

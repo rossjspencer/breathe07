@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +30,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import com.example.smartair.R4.pef.ParentSetPbActivity;
+import com.example.smartair.r3.MedicineLogActivity;
+import com.example.smartair.r3.MedicineLogFragment;
+import com.example.smartair.r3.InventoryLogActivity;
+import com.example.smartair.r3.BadgeSettingsActivity;
+import com.example.smartair.r3.ControllerLogEntry;
+import com.example.smartair.r3.RescueLogEntry;
+import com.example.smartair.r3.InventoryItem;
 import com.google.firebase.database.ChildEventListener;
 
 public class ParentViewChildActivity extends AppCompatActivity {
@@ -35,25 +44,22 @@ public class ParentViewChildActivity extends AppCompatActivity {
     private String childId;
     private DatabaseReference mDatabase;
 
-    private TextView tvTitle, tvSharingTag, tvZoneValue, tvZoneSubtitle, tvLastRescue, tvWeeklyCount, tvAdherenceValue, tvAdherencePlan;
+    private TextView tvTitle, tvSharingTag, tvZoneValue, tvZoneSubtitle, tvLastRescue, tvWeeklyCount, tvAdherenceWeekly, tvAdherenceMonthly, tvAdherencePlan, tvReminderMessage;
     private View cardZone, cardRescue, cardTrend, cardAdherence;
+    private LinearLayout remindersLayout;
     private TrendChartView trendChartView;
-    private Button btnRange7, btnRange30, btnGenerateReport, btnQuickRescue, btnQuickController, btnViewReport, btnExpandTrend;
+    private Button btnRange7, btnRange30, btnGenerateReport, btnQuickRescue, btnQuickController, btnViewInventory, btnBadgeSettings, btnViewReport, btnExpandTrend;
     private Map<String, Boolean> sharingSettings = new HashMap<>();
 
-    private final List<RescueLog> rescueLogs = new ArrayList<>();
-    private final List<ControllerLog> controllerLogs = new ArrayList<>();
+    private final List<RescueLogEntry> rescueLogs = new ArrayList<>();
+    private final List<ControllerLogEntry> controllerLogs = new ArrayList<>(); 
     private User childProfile;
+    private Map<String, Integer> plannedSchedule = new HashMap<>(); 
+    
     private int selectedRangeDays = 7;
     private AlertHelper alertHelper;
 
     private Button btnSetPb;
-
-    /* Triage Banner
-    private TextView triageBanner;
-    private ChildEventListener triageListener;
-    private static final String PREFS_TRIAGE_SEEN = "triage_seen_prefs";
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +80,18 @@ public class ParentViewChildActivity extends AppCompatActivity {
         loadProfile();
         loadSharing();
         listenForLogs();
+        checkInventoryReminders();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh time-based calculations and single-fetch data
+        if (childProfile != null) {
+            updateAdherenceTile();
+            checkAlerts();
+        }
+        checkInventoryReminders();
     }
 
     private void bindViews() {
@@ -83,14 +101,21 @@ public class ParentViewChildActivity extends AppCompatActivity {
         tvZoneSubtitle = findViewById(R.id.tvZoneSubtitle);
         tvLastRescue = findViewById(R.id.tvLastRescue);
         tvWeeklyCount = findViewById(R.id.tvWeeklyCount);
-        tvAdherenceValue = findViewById(R.id.tvAdherenceValue);
+        tvAdherenceWeekly = findViewById(R.id.tvAdherenceWeekly);
+        tvAdherenceMonthly = findViewById(R.id.tvAdherenceMonthly);
         tvAdherencePlan = findViewById(R.id.tvAdherencePlan);
+        
+        remindersLayout = findViewById(R.id.remindersLayout);
+        tvReminderMessage = findViewById(R.id.tvReminderMessage);
+        
         trendChartView = findViewById(R.id.trendChart);
         btnRange7 = findViewById(R.id.btnRange7);
         btnRange30 = findViewById(R.id.btnRange30);
         btnGenerateReport = findViewById(R.id.btnGenerateReport);
         btnQuickRescue = findViewById(R.id.btnQuickRescue);
         btnQuickController = findViewById(R.id.btnQuickController);
+        btnViewInventory = findViewById(R.id.btnViewInventory);
+        btnBadgeSettings = findViewById(R.id.btnBadgeSettings);
         btnViewReport = findViewById(R.id.btnViewReport);
         btnExpandTrend = findViewById(R.id.btnExpandTrend);
         btnSetPb = findViewById(R.id.btn_set_pb);
@@ -98,7 +123,6 @@ public class ParentViewChildActivity extends AppCompatActivity {
         cardRescue = findViewById(R.id.cardRescue);
         cardTrend = findViewById(R.id.cardTrend);
         cardAdherence = findViewById(R.id.cardAdherence);
-        //triageBanner = findViewById(R.id.triageBanner);
     }
 
     private void wireActions() {
@@ -113,8 +137,35 @@ public class ParentViewChildActivity extends AppCompatActivity {
         btnGenerateReport.setOnClickListener(v -> {
             ProviderReportActivity.launch(this, childId, selectedRangeDays);
         });
-        btnQuickRescue.setOnClickListener(v -> showRescueLogDialog());
-        btnQuickController.setOnClickListener(v -> showControllerLogDialog());
+        
+        btnQuickRescue.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MedicineLogActivity.class);
+            intent.putExtra("CHILD_ID", childId);
+            intent.putExtra(MedicineLogFragment.ARG_TYPE, "RESCUE");
+            intent.putExtra(MedicineLogFragment.ARG_ROLE, "Parent");
+            startActivity(intent);
+        });
+        
+        btnQuickController.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MedicineLogActivity.class);
+            intent.putExtra("CHILD_ID", childId);
+            intent.putExtra(MedicineLogFragment.ARG_TYPE, "CONTROLLER");
+            intent.putExtra(MedicineLogFragment.ARG_ROLE, "Parent");
+            startActivity(intent);
+        });
+        
+        btnViewInventory.setOnClickListener(v -> {
+            Intent intent = new Intent(this, InventoryLogActivity.class);
+            intent.putExtra("CHILD_ID", childId);
+            startActivity(intent);
+        });
+        
+        btnBadgeSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BadgeSettingsActivity.class);
+            intent.putExtra("CHILD_ID", childId);
+            startActivity(intent);
+        });
+        
         btnViewReport.setOnClickListener(v -> openExistingReport());
         btnExpandTrend.setOnClickListener(v -> {
             Intent intent = new Intent(this, TrendDetailActivity.class);
@@ -129,10 +180,10 @@ public class ParentViewChildActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        cardRescue.setOnClickListener(v -> showRescueLogDialog());
+        // cardRescue click listener removed
+
         cardAdherence.setOnClickListener(v -> {
-            // Jump to manage child so parent can adjust controller plan
-            Intent intent = new Intent(this, ManageChildActivity.class);
+            Intent intent = new Intent(this, AdherenceSummaryActivity.class);
             intent.putExtra("CHILD_ID", childId);
             startActivity(intent);
         });
@@ -172,6 +223,19 @@ public class ParentViewChildActivity extends AppCompatActivity {
                             (childProfile.lastName != null ? " " + childProfile.lastName : "");
                     tvTitle.setText(name + " - Parent Dashboard");
                     updateZoneTile(childProfile.asthmaScore);
+                    
+                    plannedSchedule.clear();
+                    DataSnapshot schedSnap = snapshot.child("plannedSchedule");
+                    if (schedSnap.exists()) {
+                        for (DataSnapshot d : schedSnap.getChildren()) {
+                            String day = d.getKey();
+                            Integer val = d.getValue(Integer.class);
+                            if (day != null && val != null) {
+                                plannedSchedule.put(day, val);
+                            }
+                        }
+                    }
+                    
                     updateAdherenceTile();
                 }
             }
@@ -199,13 +263,18 @@ public class ParentViewChildActivity extends AppCompatActivity {
     }
 
     private void listenForLogs() {
-        mDatabase.child("users").child(childId).child("rescueLogs")
+        // Modified to listen to medicine_logs/rescue
+        DatabaseReference medicineLogsRef = FirebaseDatabase
+                .getInstance("https://smartair-a6669-default-rtdb.firebaseio.com")
+                .getReference("medicine_logs");
+
+        medicineLogsRef.child("rescue").child(childId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         rescueLogs.clear();
                         for (DataSnapshot child : snapshot.getChildren()) {
-                            RescueLog log = child.getValue(RescueLog.class);
+                            RescueLogEntry log = child.getValue(RescueLogEntry.class);
                             if (log != null) rescueLogs.add(log);
                         }
                         updateRescueTile();
@@ -216,13 +285,14 @@ public class ParentViewChildActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
-        mDatabase.child("users").child(childId).child("controllerLogs")
+        // Controller logs
+        medicineLogsRef.child("controller").child(childId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         controllerLogs.clear();
                         for (DataSnapshot child : snapshot.getChildren()) {
-                            ControllerLog log = child.getValue(ControllerLog.class);
+                            ControllerLogEntry log = child.getValue(ControllerLogEntry.class);
                             if (log != null) controllerLogs.add(log);
                         }
                         updateAdherenceTile();
@@ -231,89 +301,6 @@ public class ParentViewChildActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
-    //TRIAGE BANNER
-    /*
-    private long getLastSeenTriageTs(String childId) {
-        return getSharedPreferences(PREFS_TRIAGE_SEEN, MODE_PRIVATE)
-                .getLong("lastSeenTs_" + childId, 0L);
-    }
-
-    private void setLastSeenTriageTs(String childId, long ts) {
-        getSharedPreferences(PREFS_TRIAGE_SEEN, MODE_PRIVATE)
-                .edit()
-                .putLong("lastSeenTs_" + childId, ts)
-                .apply();
-    }
-
-    private void showTriageBanner() {
-        if (triageBanner.getVisibility() != View.VISIBLE) {
-            triageBanner.setVisibility(View.VISIBLE);
-            triageBanner.setOnClickListener(v -> {
-                // Mark latest as seen, then hide
-                mDatabase.child("users").child(childId).child("triageIncidents")
-                        .orderByChild("timestamp").limitToLast(1)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                long maxTs = 0L;
-                                for (DataSnapshot ds : snapshot.getChildren()) {
-                                    Long ts = ds.child("timestamp").getValue(Long.class);
-                                    if (ts != null && ts > maxTs) maxTs = ts;
-                                }
-                                if (maxTs > 0L) setLastSeenTriageTs(childId, maxTs);
-                                triageBanner.setVisibility(View.GONE);
-                            }
-                            @Override public void onCancelled(@NonNull DatabaseError error) {}
-                        });
-            });
-        }
-    }
-
-    private void startTriageListener() {
-        if (triageListener != null) return;
-
-        DatabaseReference triageRef = mDatabase.child("users")
-                .child(childId)
-                .child("triageIncidents");
-
-        triageListener = new ChildEventListener() {
-            @Override public void onChildAdded(@NonNull DataSnapshot snap, String prev) {
-                Long ts = snap.child("timestamp").getValue(Long.class);
-                if (ts == null) return;
-                if (ts > getLastSeenTriageTs(childId)) {
-                    showTriageBanner();
-                }
-            }
-            @Override public void onChildChanged(@NonNull DataSnapshot s, String p) {}
-            @Override public void onChildRemoved(@NonNull DataSnapshot s) {}
-            @Override public void onChildMoved(@NonNull DataSnapshot s, String p) {}
-            @Override public void onCancelled(@NonNull DatabaseError e) {}
-        };
-
-        triageRef.addChildEventListener(triageListener);
-
-        // Also check most recent on entry, in case it arrived while screen wasn’t active
-        triageRef.orderByChild("timestamp").limitToLast(1)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            Long ts = ds.child("timestamp").getValue(Long.class);
-                            if (ts != null && ts > getLastSeenTriageTs(childId)) {
-                                showTriageBanner();
-                            }
-                        }
-                    }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
-                });
-    }
-
-    private void stopTriageListener() {
-        if (triageListener != null) {
-            mDatabase.child("users").child(childId).child("triageIncidents")
-                    .removeEventListener(triageListener);
-            triageListener = null;
-        }
-    }
-    */
 
     private void updateZoneTile(int score) {
         tvZoneValue.setText(score + "%");
@@ -336,15 +323,34 @@ public class ParentViewChildActivity extends AppCompatActivity {
             tvWeeklyCount.setText("Weekly count: 0");
             return;
         }
-        RescueLog latest = rescueLogs.get(0);
-        for (RescueLog log : rescueLogs) {
-            if (log.timestamp > latest.timestamp) latest = log;
-        }
+        
+        RescueLogEntry latest = getLatestRescueLog();
+        
         DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, Locale.getDefault());
-        tvLastRescue.setText(df.format(new Date(latest.timestamp)));
+        long ts = parseTimestamp(latest.timestamp);
+        if (ts > 0) {
+            tvLastRescue.setText(df.format(new Date(ts)));
+        } else {
+            tvLastRescue.setText(latest.timestamp);
+        }
 
         int weekly = countRescuesInDays(7);
         tvWeeklyCount.setText("Weekly count: " + weekly);
+    }
+    
+    private RescueLogEntry getLatestRescueLog() {
+        if (rescueLogs.isEmpty()) return null;
+        RescueLogEntry latest = rescueLogs.get(0);
+        long latestTs = parseTimestamp(latest.timestamp);
+        
+        for (RescueLogEntry log : rescueLogs) {
+            long ts = parseTimestamp(log.timestamp);
+            if (ts > latestTs) {
+                latest = log;
+                latestTs = ts;
+            }
+        }
+        return latest;
     }
 
     private void refreshTrend() {
@@ -362,8 +368,9 @@ public class ParentViewChildActivity extends AppCompatActivity {
             long start = now - (i + 1) * dayMs;
             long end = now - i * dayMs;
             int count = 0;
-            for (RescueLog log : rescueLogs) {
-                if (log.timestamp >= start && log.timestamp < end) count++;
+            for (RescueLogEntry log : rescueLogs) {
+                long ts = parseTimestamp(log.timestamp);
+                if (ts >= start && ts < end) count++;
             }
             counts.add(count);
         }
@@ -374,36 +381,118 @@ public class ParentViewChildActivity extends AppCompatActivity {
         long now = System.currentTimeMillis();
         long range = days * 24L * 60 * 60 * 1000;
         int count = 0;
-        for (RescueLog log : rescueLogs) {
-            if (now - log.timestamp <= range) count++;
+        for (RescueLogEntry log : rescueLogs) {
+            long ts = parseTimestamp(log.timestamp);
+            if (now - ts <= range) count++;
         }
         return count;
     }
 
     private void updateAdherenceTile() {
         if (childProfile == null) return;
-        int perDay = Math.max(1, childProfile.plannedControllerPerDay);
-        int perWeek = Math.max(1, childProfile.plannedControllerDaysPerWeek);
-        tvAdherencePlan.setText("Plan: " + perDay + "x daily, " + perWeek + " days/week");
+        
+        StringBuilder sb = new StringBuilder("Plan: ");
+        if (plannedSchedule.isEmpty()) {
+            sb.append("No schedule set");
+        } else {
+            sb.append("Custom Schedule");
+        }
+        tvAdherencePlan.setText(sb.toString());
 
         long now = System.currentTimeMillis();
-        long thirtyDaysMs = 30L * 24 * 60 * 60 * 1000;
+        // Time parts reset for today
+        Calendar today = Calendar.getInstance();
+        today.setTimeInMillis(now);
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         Map<String, Integer> dailyCount = new HashMap<>();
-        for (ControllerLog log : controllerLogs) {
-            if (now - log.timestamp > thirtyDaysMs) continue;
-            String dayKey = dayKey(log.timestamp);
-            int current = dailyCount.containsKey(dayKey) ? dailyCount.get(dayKey) : 0;
-            dailyCount.put(dayKey, current + log.doses);
+        for (ControllerLogEntry log : controllerLogs) {
+            if (log.timestamp == null) continue;
+            try {
+                Date date = sdf.parse(log.timestamp);
+                if (date == null) continue;
+                String dayKey = dayKey(date.getTime());
+                int current = dailyCount.containsKey(dayKey) ? dailyCount.get(dayKey) : 0;
+                dailyCount.put(dayKey, current + log.doseCount);
+            } catch (ParseException e) {}
         }
 
-        int plannedDays = Math.max(1, (int) Math.round((perWeek / 7.0) * 30));
-        int completedDays = 0;
-        for (Integer doses : dailyCount.values()) {
-            if (doses >= perDay) completedDays++;
+        // Weekly Calculation (Current Week: Sun -> Today)
+        double weeklyAdherence = calculateAdherenceForWeek(today, dailyCount);
+        tvAdherenceWeekly.setText(String.format(Locale.getDefault(), "%.0f%%", weeklyAdherence));
+        
+        // Monthly Calculation (Last 30 Days)
+        double monthlyAdherence = calculateAdherenceForLast30Days(today, dailyCount);
+        tvAdherenceMonthly.setText(String.format(Locale.getDefault(), "%.0f%%", monthlyAdherence));
+    }
+    
+    private double calculateAdherenceForWeek(Calendar today, Map<String, Integer> dailyCount) {
+        Calendar cal = (Calendar) today.clone();
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        if (cal.after(today)) cal.add(Calendar.DAY_OF_YEAR, -7);
+        
+        int plannedDays = 0;
+        int compliantDays = 0;
+        
+        Calendar iter = (Calendar) cal.clone();
+        for (int i = 0; i < 7; i++) {
+            if (iter.after(today)) break;
+            
+            int dayOfWeek = iter.get(Calendar.DAY_OF_WEEK);
+            String dayStr = getDayString(dayOfWeek);
+            int planned = plannedSchedule.getOrDefault(dayStr, 0);
+            
+            plannedDays++;
+            String dKey = dayKey(iter.getTimeInMillis());
+            int actual = dailyCount.getOrDefault(dKey, 0);
+            if (actual >= planned) compliantDays++;
+
+            iter.add(Calendar.DAY_OF_YEAR, 1);
         }
-        double adherence = (completedDays / (double) plannedDays) * 100;
-        if (adherence > 100) adherence = 100;
-        tvAdherenceValue.setText(String.format(Locale.getDefault(), "%.0f%%", adherence));
+        
+        if (plannedDays == 0) return 100;
+        return ((double) compliantDays / plannedDays) * 100;
+    }
+    
+    private double calculateAdherenceForLast30Days(Calendar today, Map<String, Integer> dailyCount) {
+        int plannedDays = 0;
+        int compliantDays = 0;
+        
+        Calendar iter = (Calendar) today.clone();
+        iter.add(Calendar.DAY_OF_YEAR, -29);
+        
+        for (int i = 0; i < 30; i++) {
+            int dayOfWeek = iter.get(Calendar.DAY_OF_WEEK);
+            String dayStr = getDayString(dayOfWeek);
+            int planned = plannedSchedule.getOrDefault(dayStr, 0);
+            
+            plannedDays++;
+            String dKey = dayKey(iter.getTimeInMillis());
+            int actual = dailyCount.getOrDefault(dKey, 0);
+            if (actual >= planned) compliantDays++;
+
+            iter.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        
+        if (plannedDays == 0) return 100;
+        return ((double) compliantDays / plannedDays) * 100;
+    }
+    
+    private String getDayString(int calendarDay) {
+        switch (calendarDay) {
+            case Calendar.SUNDAY: return "Sun";
+            case Calendar.MONDAY: return "Mon";
+            case Calendar.TUESDAY: return "Tue";
+            case Calendar.WEDNESDAY: return "Wed";
+            case Calendar.THURSDAY: return "Thu";
+            case Calendar.FRIDAY: return "Fri";
+            case Calendar.SATURDAY: return "Sat";
+            default: return "Mon";
+        }
     }
 
     private String dayKey(long timestamp) {
@@ -414,27 +503,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
         return y + "-" + d;
     }
 
-    private void showRescueLogDialog() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_log_rescue, null);
-        EditText etDose = dialogView.findViewById(R.id.etDose);
-        EditText etFeeling = dialogView.findViewById(R.id.etFeeling);
-
-        new AlertDialog.Builder(this)
-                .setTitle("Log Rescue Use")
-                .setView(dialogView)
-                .setPositiveButton("Save", (d, which) -> {
-                    int dose = parseInt(etDose.getText().toString(), 1);
-                    boolean worseAfterDose = !TextUtils.isEmpty(etFeeling.getText()) &&
-                            etFeeling.getText().toString().toLowerCase().contains("worse");
-                    RescueLog log = new RescueLog(System.currentTimeMillis(), dose, worseAfterDose);
-                    mDatabase.child("users").child(childId).child("rescueLogs").push().setValue(log);
-                    mDatabase.child("users").child(childId).child("lastRescueTimestamp").setValue(log.timestamp);
-                    Toast.makeText(this, "Rescue logged", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
+    // Keeping for now but not used by button anymore
     private void showControllerLogDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_log_controller, null);
         EditText etDose = dialogView.findViewById(R.id.etControllerDose);
@@ -444,8 +513,18 @@ public class ParentViewChildActivity extends AppCompatActivity {
                 .setView(dialogView)
                 .setPositiveButton("Save", (d, which) -> {
                     int dose = parseInt(etDose.getText().toString(), 1);
-                    ControllerLog log = new ControllerLog(System.currentTimeMillis(), dose);
-                    mDatabase.child("users").child(childId).child("controllerLogs").push().setValue(log);
+                    
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                    String timestamp = sdf.format(new Date());
+                    
+                    ControllerLogEntry log = new ControllerLogEntry("Manual Entry", dose, timestamp);
+                    
+                    DatabaseReference logsRef = FirebaseDatabase
+                            .getInstance("https://smartair-a6669-default-rtdb.firebaseio.com")
+                            .getReference("medicine_logs");
+                            
+                    logsRef.child("controller").child(childId).push().setValue(log);
+                    
                     Toast.makeText(this, "Controller logged", Toast.LENGTH_SHORT).show();
                     updateAdherenceTile();
                 })
@@ -473,17 +552,27 @@ public class ParentViewChildActivity extends AppCompatActivity {
         int rapidCount = 0;
         long now = System.currentTimeMillis();
         for (int i = rescueLogs.size() - 1; i >= 0; i--) {
-            RescueLog log = rescueLogs.get(i);
-            if (now - log.timestamp <= 3 * 60 * 60 * 1000) rapidCount++;
+            RescueLogEntry log = rescueLogs.get(i);
+            long ts = parseTimestamp(log.timestamp);
+            if (now - ts <= 3 * 60 * 60 * 1000) rapidCount++;
         }
         if (rapidCount >= 3) {
             alertHelper.maybeNotify("rapidRescue", "Rapid rescue repeats", "3+ rescue uses in 3 hours.");
         }
 
-        // Worse after dose flag
-        if (!rescueLogs.isEmpty() && rescueLogs.get(rescueLogs.size() - 1).worseAfterDose) {
-            alertHelper.maybeNotify("worseAfterDose", "Worse after dose", "Child reported feeling worse after rescue.");
-        }
+        // Worse feeling from Inhaler Guide
+        mDatabase.child("guide_stats").child(childId).child("pendingNotifications").child("worse_feeling")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists() && Boolean.TRUE.equals(snapshot.getValue(Boolean.class))) {
+                            alertHelper.maybeNotify("worseFeeling", "Worse after dose", "Child reported feeling worse after inhaler usage.");
+                            snapshot.getRef().removeValue();
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
 
         // Inventory low/expired
         mDatabase.child("users").child(childId).child("inventory").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -521,20 +610,87 @@ public class ParentViewChildActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
-
-    //Overrides for Triage Banner
-    /*
-    @Override
-    protected void onStart() {
-        super.onStart();
-        startTriageListener();
+    
+    private void checkInventoryReminders() {
+        DatabaseReference inventoryRef = FirebaseDatabase.getInstance().getReference("inventory");
+        
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> messages = new ArrayList<>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                Calendar cal = Calendar.getInstance();
+                // Clear time for date comparison consistency
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                
+                Date today = cal.getTime();
+                cal.add(Calendar.DAY_OF_YEAR, 7);
+                Date nextWeek = cal.getTime();
+                
+                // Check Controller
+                checkItems(snapshot.child("controller").child(childId), messages, today, nextWeek);
+                // Check Rescue
+                checkItems(snapshot.child("rescue").child(childId), messages, today, nextWeek);
+                
+                if (!messages.isEmpty()) {
+                    remindersLayout.setVisibility(View.VISIBLE);
+                    StringBuilder sb = new StringBuilder();
+                    for (String msg : messages) {
+                        if (sb.length() > 0) sb.append("\n");
+                        sb.append("• ").append(msg);
+                    }
+                    TextView tv = findViewById(R.id.tvReminderMessage);
+                    tv.setText(sb.toString());
+                } else {
+                    remindersLayout.setVisibility(View.GONE);
+                }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        };
+        
+        inventoryRef.addListenerForSingleValueEvent(listener);
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        stopTriageListener();
+    
+    private void checkItems(DataSnapshot itemsSnap, List<String> messages, Date today, Date nextWeek) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        for (DataSnapshot itemSnap : itemsSnap.getChildren()) {
+            InventoryItem item = itemSnap.getValue(InventoryItem.class);
+            if (item != null) {
+                if (item.percentLeft <= 0) {
+                    messages.add("Inhaler " + item.name + " is empty!");
+                } else if (item.isLow()) {
+                    messages.add("Inhaler " + item.name + " is low (" + item.percentLeft + "%).");
+                }
+                
+                if (item.expiryDate != null) {
+                    try {
+                        Date exp = sdf.parse(item.expiryDate);
+                        if (exp != null) {
+                            if (exp.compareTo(today) <= 0) {
+                                messages.add("Inhaler " + item.name + " has expired!");
+                            } else if (exp.compareTo(nextWeek) <= 0) {
+                                messages.add("Inhaler " + item.name + " expires soon (" + item.expiryDate + ").");
+                            }
+                        }
+                    } catch (ParseException e) {
+                        // Fallback or ignore
+                    }
+                }
+            }
+        }
     }
-    */
-
+    
+    private long parseTimestamp(String timestamp) {
+        if (timestamp == null) return 0;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        try {
+            Date d = sdf.parse(timestamp);
+            return d != null ? d.getTime() : 0;
+        } catch (ParseException e) {
+            return 0;
+        }
+    }
 }

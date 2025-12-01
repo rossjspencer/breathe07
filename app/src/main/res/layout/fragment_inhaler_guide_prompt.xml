@@ -17,7 +17,9 @@
             android:id="@+id/guideBackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back" />
+            android:text="Back"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <TextView
@@ -33,6 +35,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ready"
-        android:paddingHorizontal="32dp" />
+        android:paddingHorizontal="32dp"
+        android:backgroundTint="#1565C0"
+        android:textColor="#FFFFFF" />
 
 </LinearLayout>

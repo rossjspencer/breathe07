@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.smartair">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Android 13+ runtime permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -37,6 +36,12 @@
         <activity android:name=".R4.pef.PefEntryActivity"/>
         <activity android:name=".R4.triage.TriageActivity"/>
         <activity android:name=".R4.pef.ParentSetPbActivity" />
+        <activity android:name=".r3.InventoryLogActivity" />
+        <activity android:name=".r3.BadgeSettingsActivity" />
+        <activity android:name=".r3.MedicineLogActivity" />
+        <activity android:name=".r3.BadgesActivity" />
+        <activity android:name=".r3.InhalerGuideActivity" />
+        <activity android:name=".AdherenceSummaryActivity" />
 
         <activity
             android:name=".MainActivity"

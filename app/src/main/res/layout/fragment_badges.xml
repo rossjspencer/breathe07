@@ -5,19 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp">
-
-        <Button
-            android:id="@+id/badgesBackButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back" />
-    </LinearLayout>
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,11 +18,22 @@
         android:id="@+id/textCurrentStreak"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Current Streak: 0 Days 🔥"
+        android:text="Technique Streak: 0 Days 🔥"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#FF5722"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/textControllerStreak"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Controller Streak: 0 Days ⭐"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#4CAF50"
         android:layout_marginBottom="24dp" />
 
     <FrameLayout
