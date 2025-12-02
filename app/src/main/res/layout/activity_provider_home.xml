@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="#E4F1E2">
+    android:background="#E4F1FF">
 
     <!-- Title -->
     <TextView
@@ -36,7 +36,7 @@
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:text="Logout"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:layout_marginTop="20dp"
         android:layout_gravity="center"
         android:background="@drawable/rounded_button" />

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center_horizontal"
-    android:background="#FFFFFF">
+    android:background="#E4F1FF">
 
     <TextView
         android:layout_width="wrap_content"
@@ -86,7 +86,7 @@
         android:layout_height="60dp"
         android:text="Daily Triggers/Symptoms Log"
         android:textSize="18sp"
-        android:backgroundTint="#FF5722"
+        android:backgroundTint="#2196F3"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="16dp"/>
 
@@ -104,7 +104,7 @@
             android:layout_weight="1"
             android:text="View Rescue Log"
             android:textSize="14sp"
-            android:backgroundTint="#C62828"
+            android:backgroundTint="#1565C0"
             android:layout_marginEnd="4dp" />
 
         <Button
@@ -124,7 +124,7 @@
         android:layout_height="60dp"
         android:text="View History"
         android:textSize="18sp"
-        android:backgroundTint="#673AB7" />
+        android:backgroundTint="#000080" />
 
     <Button
         android:id="@+id/btnAwards"
@@ -139,7 +139,7 @@
         android:id="@+id/triage_button"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:backgroundTint="#2196F3"
+        android:backgroundTint="#673AB7"
         android:text="Triage"
         android:layout_marginTop="10dp"
         android:elevation="4dp"
