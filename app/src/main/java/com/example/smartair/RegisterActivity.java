@@ -166,6 +166,13 @@ public class RegisterActivity extends AppCompatActivity {
                     }
 
                     db.child(uid).setValue(user).addOnSuccessListener(v -> {
+                        DatabaseReference statsRef = FirebaseDatabase.getInstance()
+                                .getReference("guide_stats")
+                                .child(uid);
+
+                        statsRef.child("accountCreationDate")
+                                .setValue(ServerValue.TIMESTAMP); // BEST PRACTICE
+
                         startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                         finish();
                     });
