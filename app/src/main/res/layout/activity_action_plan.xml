@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Page Title -->
+        <TextView
+            android:id="@+id/tvActionPlanTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Child Asthma Action Plan"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:paddingBottom="20dp"/>
+
+        <!-- GREEN ZONE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Green Zone Instructions"
+            android:textStyle="bold"
+            android:textColor="#4CAF50"
+            android:textSize="18sp"
+            android:paddingBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etGreenSteps"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:hint="Enter steps for Green Zone..."
+            android:gravity="top"
+            android:textColor="#000000"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:textSize="15sp"/>
+
+        <!-- YELLOW ZONE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Yellow Zone Instructions"
+            android:textStyle="bold"
+            android:textColor="#FFC107"
+            android:textSize="18sp"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etYellowSteps"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:hint="Enter steps for Yellow Zone..."
+            android:gravity="top"
+            android:textColor="#000000"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:textSize="15sp"/>
+
+        <!-- RED ZONE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Red Zone Instructions"
+            android:textStyle="bold"
+            android:textColor="#F44336"
+            android:textSize="18sp"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etRedSteps"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:hint="Enter steps for Red Zone..."
+            android:gravity="top"
+            android:textColor="#000000"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:textSize="15sp"/>
+
+        <!-- EMERGENCY -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Emergency Instructions"
+            android:textStyle="bold"
+            android:textColor="#D32F2F"
+            android:textSize="18sp"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etEmergencySteps"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:hint="Enter steps for Emergency..."
+            android:gravity="top"
+            android:textColor="#000000"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:textSize="15sp"/>
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/btnSavePlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Action Plan"
+            android:textSize="18sp"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="20dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

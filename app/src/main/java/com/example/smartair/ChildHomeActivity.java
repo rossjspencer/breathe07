@@ -50,6 +50,8 @@ public class ChildHomeActivity extends AppCompatActivity {
     
     private static final String BADGE_CHANNEL_ID = "badge_alerts";
     private static final String PREFS_BADGES = "badge_prefs";
+    public static final String EXTRA_CHILD_ID = "CHILD_ID";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +69,26 @@ public class ChildHomeActivity extends AppCompatActivity {
         Button btnViewHistory = findViewById(R.id.btnViewHistory);
         Button btnAwards = findViewById(R.id.btnAwards);
 
-        // Triage button (keep)
-        Button triageButton = findViewById(R.id.triage_button);
-        triageButton.setOnClickListener(v -> {
-            Intent i = new Intent(ChildHomeActivity.this, TriageActivity.class);
-            i.putExtra("childId", currentChildId);
-            startActivity(i);
-        });
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        if (getIntent().hasExtra("CHILD_ID")) {
-            currentChildId = getIntent().getStringExtra("CHILD_ID");
+        if (getIntent().hasExtra(EXTRA_CHILD_ID)) {
+            currentChildId = getIntent().getStringExtra(EXTRA_CHILD_ID);
         } else if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             currentChildId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
+        // Triage button (keep)
+        Button triageButton = findViewById(R.id.triage_button);
+        triageButton.setOnClickListener(v -> {
+            if (currentChildId == null || currentChildId.isEmpty()) {
+                Toast.makeText(this, "No child selected for triage", Toast.LENGTH_LONG).show();
+                return;
+            }
+            Intent i = new Intent(ChildHomeActivity.this, TriageActivity.class);
+            i.putExtra(EXTRA_CHILD_ID, currentChildId); // use the same key you read
+            startActivity(i);
+        });
+
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
 
         if (currentChildId != null) {
             loadChildData();

@@ -346,6 +346,17 @@
             android:textColor="@android:color/white"
             android:backgroundTint="#00897B" />
 
+        <Button
+            android:id="@+id/btnEditActionPlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Edit Action Plan"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#00897B"/>
+
+
 
         <Button
             android:id="@+id/btnGenerateReport"

@@ -42,6 +42,7 @@
         <activity android:name=".r3.BadgesActivity" />
         <activity android:name=".r3.InhalerGuideActivity" />
         <activity android:name=".AdherenceSummaryActivity" />
+        <activity android:name=".R4.triage.ActionPlanActivity" />
 
         <activity
             android:name=".MainActivity"

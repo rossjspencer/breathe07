@@ -14,6 +14,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import android.content.pm.PackageManager;
+
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+
+import com.example.smartair.R4.model.TriageIncident;
+
+import com.example.smartair.R4.triage.ActionPlanActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -76,12 +90,15 @@ public class ParentViewChildActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         alertHelper = new AlertHelper(this);
 
+
+        createTriageChannel();
         bindViews();
         wireActions();
         loadProfile();
         loadSharing();
         listenForLogs();
         checkInventoryReminders();
+        listenForTriageUpdates();
     }
 
     @Override
@@ -200,6 +217,14 @@ public class ParentViewChildActivity extends AppCompatActivity {
             i.putExtra(ParentSetPbActivity.EXTRA_CHILD_ID, childId); // pass the child being viewed
             startActivity(i);
         });
+
+        Button btnEditPlan = findViewById(R.id.btnEditActionPlan);
+        btnEditPlan.setOnClickListener(v -> {
+            Intent i = new Intent(ParentViewChildActivity.this, ActionPlanActivity.class);
+            i.putExtra("CHILD_ID", childId);
+            startActivity(i);
+        });
+
 
     }
 
@@ -685,6 +710,80 @@ public class ParentViewChildActivity extends AppCompatActivity {
             }
         }
     }
+
+    //Triage Notification
+    private static final String TRIAGE_CHANNEL = "triage_alerts";
+
+    private void createTriageChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel ch = new NotificationChannel(
+                    TRIAGE_CHANNEL,
+                    "Triage Alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            ch.setDescription("Notifications for triage updates");
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(ch);
+        }
+    }
+    private void listenForTriageUpdates() {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("children_triage_incidents")
+                .child(childId);
+
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snap, String prev) {
+                TriageIncident inc = snap.getValue(TriageIncident.class);
+                if (inc != null) {
+                    showTriageNotification("New triage session started");
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snap, String prev) {
+                TriageIncident inc = snap.getValue(TriageIncident.class);
+                if (inc != null && Boolean.TRUE.equals(inc.escalated)) {
+                    showTriageNotification("Triage escalation detected!");
+                }
+            }
+
+            @Override public void onChildRemoved(@NonNull DataSnapshot snap) {}
+            @Override public void onChildMoved(@NonNull DataSnapshot snap, String prev) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void showTriageNotification(String message) {
+
+        // Android 13+ permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return; // Don’t crash; silently skip
+            }
+        }
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this, TRIAGE_CHANNEL)
+                        .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                        .setContentTitle("Triage Update")
+                        .setContentText(message)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setAutoCancel(true);
+
+        // Unique ID
+        int notifId = (int) (System.currentTimeMillis() & 0xfffffff);
+
+        try {
+            NotificationManagerCompat.from(this).notify(notifId, builder.build());
+        } catch (SecurityException ignored) {
+            // Happens if no permission — ignore
+        }
+    }
+
+
+
 
     private long parseTimestamp(String timestamp) {
         if (timestamp == null) return 0;
