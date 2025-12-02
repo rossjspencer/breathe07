@@ -38,6 +38,26 @@
             android:textColor="@android:color/white"
             android:visibility="gone" />
 
+        <!-- Reminder Section -->
+        <LinearLayout
+            android:id="@+id/remindersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:padding="12dp"
+            android:background="#FFEBEE"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvReminderMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reminder"
+                android:textColor="#D32F2F"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tvDashboardHint"
             android:layout_width="match_parent"
@@ -64,48 +84,34 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today's Zone"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Today's Zone"
-                            android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvZoneValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="--"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/tvZoneValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="--"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvZoneSubtitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Waiting for data" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/ivShareZone"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_share_green"
-                        android:layout_gravity="top|end"
-                        android:layout_margin="8dp"
-                        android:visibility="gone" />
-                </FrameLayout>
+                    <TextView
+                        android:id="@+id/tvZoneSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Waiting for data" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -118,47 +124,33 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Last Rescue Time"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Last Rescue Time"
-                            android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvLastRescue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="No rescue logged"
+                        android:textSize="18sp" />
 
-                        <TextView
-                            android:id="@+id/tvLastRescue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="No rescue logged"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tvWeeklyCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Weekly count: 0" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/ivShareRescue"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_share_green"
-                        android:layout_gravity="top|end"
-                        android:layout_margin="8dp"
-                        android:visibility="gone" />
-                </FrameLayout>
+                    <TextView
+                        android:id="@+id/tvWeeklyCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Weekly count: 0" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -171,67 +163,53 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rescue Trend Snippet"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="horizontal">
 
-                        <TextView
+                        <Button
+                            android:id="@+id/btnRange7"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Trend Snippet"
-                            android:textStyle="bold" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_marginEnd="4dp"
+                            android:minWidth="0dp"
+                            android:text="7d"
+                            android:textSize="12sp"
+                            android:textColor="@android:color/black"
+                            android:backgroundTint="#E0E0E0" />
+                        <Button
+                            android:id="@+id/btnRange30"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="end"
-                            android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/btnRange7"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="4dp"
-                                android:minWidth="0dp"
-                                android:text="7d"
-                                android:textSize="12sp"
-                                android:textColor="@android:color/black"
-                                android:backgroundTint="#E0E0E0" />
-                            <Button
-                                android:id="@+id/btnRange30"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:minWidth="0dp"
-                                android:text="30d"
-                                android:textSize="12sp"
-                                android:textColor="@android:color/black"
-                                android:backgroundTint="#E0E0E0" />
-                        </LinearLayout>
-
-                        <com.example.smartair.TrendChartView
-                            android:id="@+id/trendChart"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_weight="1"
-                            android:background="#F5F5F5" />
+                            android:minWidth="0dp"
+                            android:text="30d"
+                            android:textSize="12sp"
+                            android:textColor="@android:color/black"
+                            android:backgroundTint="#E0E0E0" />
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/ivShareTrend"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_share_green"
-                        android:layout_gravity="top|end"
-                        android:layout_margin="8dp"
-                        android:visibility="gone" />
-                </FrameLayout>
+                    <com.example.smartair.TrendChartView
+                        android:id="@+id/trendChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:background="#F5F5F5" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -244,48 +222,70 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Controller Adherence"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Controller Adherence"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Weekly"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvAdherenceWeekly"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--%"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tvAdherenceValue"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="--%"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvAdherencePlan"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Plan: 1x daily, 7 days/week" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Monthly"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvAdherenceMonthly"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--%"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/ivShareAdherence"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_share_green"
-                        android:layout_gravity="top|end"
-                        android:layout_margin="8dp"
-                        android:visibility="gone" />
-                </FrameLayout>
+                    <TextView
+                        android:id="@+id/tvAdherencePlan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Plan: 1x daily, 7 days/week" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
         </GridLayout>
 
@@ -301,7 +301,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Log Rescue"
+                android:text="View Rescue Log"
                 android:backgroundTint="#C62828"
                 android:textColor="@android:color/white"/>
 
@@ -311,10 +311,30 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Log Controller"
+                android:text="View Controller Log"
                 android:backgroundTint="#1565C0"
                 android:textColor="@android:color/white"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnViewInventory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="View Inventory"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#FF9800" />
+
+        <Button
+            android:id="@+id/btnBadgeSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Badge Settings"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#7B1FA2" />
 
         <Button
             android:id="@+id/btn_set_pb"

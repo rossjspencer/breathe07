@@ -18,7 +18,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:backgroundTint="#F5F5F5"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
@@ -58,13 +58,25 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Big Take Dose Button -->
+    <Button
+        android:id="@+id/btnTakeDose"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="Take Dose"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:elevation="8dp"
+        android:backgroundTint="#4CAF50"
+        android:layout_marginBottom="24dp" />
+
     <Button
         android:id="@+id/btnLogPef"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="Log Peak Flow"
         android:textSize="18sp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:elevation="4dp"
         android:backgroundTint="#2196F3" />
 
@@ -75,7 +87,36 @@
         android:text="Daily Triggers/Symptoms Log"
         android:textSize="18sp"
         android:backgroundTint="#FF5722"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnViewRescueLog"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="View Rescue Log"
+            android:textSize="14sp"
+            android:backgroundTint="#C62828"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/btnViewControllerLog"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="View Controller Log"
+            android:textSize="14sp"
+            android:backgroundTint="#1565C0"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnViewHistory"
@@ -84,6 +125,15 @@
         android:text="View History"
         android:textSize="18sp"
         android:backgroundTint="#673AB7" />
+
+    <Button
+        android:id="@+id/btnAwards"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Awards"
+        android:textSize="18sp"
+        android:backgroundTint="#FF9800"
+        android:layout_marginTop="10dp" />
 
     <Button
         android:id="@+id/triage_button"

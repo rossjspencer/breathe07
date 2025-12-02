@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.io.File;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.example.smartair.r3.ControllerLogEntry;
 
 public class ProviderViewPatientActivity extends AppCompatActivity {
 
@@ -31,10 +33,11 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
     private TextView tvTitle, tvSharingStatus, tvReportMeta, tvRescueStats, tvAdherenceStats, tvTriageStats;
     private Button btnViewPdf;
     private final List<RescueLog> rescueLogs = new ArrayList<>();
-    private final List<ControllerLog> controllerLogs = new ArrayList<>();
+    private final List<ControllerLogEntry> controllerLogs = new ArrayList<>();
     private final List<ZoneEntry> zoneEntries = new ArrayList<>();
     private final List<ProviderReportActivity.TriageNote> triageNotes = new ArrayList<>();
     private final Map<String, Boolean> sharingSettings = new HashMap<>();
+    private final Map<String, Integer> plannedSchedule = new HashMap<>();
     private User childProfile;
 
     @Override
@@ -81,6 +84,19 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
                     String name = (childProfile.firstName != null ? childProfile.firstName : "Child") +
                             (childProfile.lastName != null ? " " + childProfile.lastName : "");
                     tvTitle.setText(name);
+                    
+                    plannedSchedule.clear();
+                    DataSnapshot schedSnap = snapshot.child("plannedSchedule");
+                    if (schedSnap.exists()) {
+                        for (DataSnapshot d : schedSnap.getChildren()) {
+                            String day = d.getKey();
+                            Integer val = d.getValue(Integer.class);
+                            if (day != null && val != null) {
+                                plannedSchedule.put(day, val);
+                            }
+                        }
+                    }
+                    refreshViews();
                 }
             }
             @Override
@@ -123,13 +139,18 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
-        mDatabase.child("users").child(childId).child("controllerLogs")
+        // Updated to use medicine_logs/controller
+        DatabaseReference medicineLogsRef = FirebaseDatabase
+                .getInstance("https://smartair-a6669-default-rtdb.firebaseio.com")
+                .getReference("medicine_logs");
+                
+        medicineLogsRef.child("controller").child(childId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         controllerLogs.clear();
                         for (DataSnapshot child : snapshot.getChildren()) {
-                            ControllerLog log = child.getValue(ControllerLog.class);
+                            ControllerLogEntry log = child.getValue(ControllerLogEntry.class);
                             if (log != null) controllerLogs.add(log);
                         }
                         refreshViews();
@@ -275,21 +296,48 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
 
     private double calculateAdherence() {
         if (childProfile == null) return 0;
-        int perDay = Math.max(1, childProfile.plannedControllerPerDay);
-        int perWeek = Math.max(1, childProfile.plannedControllerDaysPerWeek);
+        
         long now = System.currentTimeMillis();
         long thirtyDaysMs = 30L * 24 * 60 * 60 * 1000;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        
         Map<String, Integer> dailyCount = new HashMap<>();
-        for (ControllerLog log : controllerLogs) {
-            if (now - log.timestamp > thirtyDaysMs) continue;
-            String key = dayKey(log.timestamp);
-            dailyCount.put(key, dailyCount.getOrDefault(key, 0) + log.doses);
+        for (ControllerLogEntry log : controllerLogs) {
+            if (log.timestamp == null) continue;
+            try {
+                Date date = sdf.parse(log.timestamp);
+                if (date == null) continue;
+                long time = date.getTime();
+                
+                if (now - time > thirtyDaysMs) continue;
+                
+                String key = dayKey(time);
+                dailyCount.put(key, dailyCount.getOrDefault(key, 0) + log.doseCount);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-        int plannedDays = Math.max(1, (int) Math.round((perWeek / 7.0) * 30));
+        
+        int plannedDays = 0;
         int completedDays = 0;
-        for (Integer doses : dailyCount.values()) {
-            if (doses >= perDay) completedDays++;
+        Calendar cal = Calendar.getInstance();
+        
+        for (int i = 0; i < 30; i++) {
+            long time = now - (i * 24L * 60 * 60 * 1000);
+            cal.setTimeInMillis(time);
+            String dayStr = getDayString(cal.get(Calendar.DAY_OF_WEEK));
+            
+            int planned = plannedSchedule.getOrDefault(dayStr, 0);
+            if (planned > 0) {
+                plannedDays++;
+                String key = dayKey(time);
+                int actual = dailyCount.getOrDefault(key, 0);
+                if (actual >= planned) completedDays++;
+            }
         }
+        
+        if (plannedDays == 0) return 100;
+        
         double adherence = (completedDays / (double) plannedDays) * 100;
         return Math.min(100, adherence);
     }
@@ -298,6 +346,19 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(ts);
         return cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.DAY_OF_YEAR);
+    }
+    
+    private String getDayString(int calendarDay) {
+        switch (calendarDay) {
+            case Calendar.SUNDAY: return "Sun";
+            case Calendar.MONDAY: return "Mon";
+            case Calendar.TUESDAY: return "Tue";
+            case Calendar.WEDNESDAY: return "Wed";
+            case Calendar.THURSDAY: return "Thu";
+            case Calendar.FRIDAY: return "Fri";
+            case Calendar.SATURDAY: return "Sat";
+            default: return "Mon";
+        }
     }
 
     private void tryOpenPdf() {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/repeatDoseText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Place your mouth back on the opening of your inhaler, breathe out, and breathe in deeply as you press on the top of the inhaler again."
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:layout_marginBottom="32dp"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/repeatDoseNextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:text="Next"
+        android:backgroundTint="#1565C0"
+        android:textColor="#FFFFFF" />
+
+</RelativeLayout>

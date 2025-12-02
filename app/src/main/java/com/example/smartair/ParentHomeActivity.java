@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.smartair.r3.InventoryLogActivity;
+import com.example.smartair.r3.InventoryAlertService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 import java.util.ArrayList;
@@ -40,17 +42,21 @@ public class ParentHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent_home);
 
-        // 🔒 Security: Must be logged in
+        // Security: Must be logged in
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
         }
+        
+        // Start Inventory Alert Service
+        startService(new Intent(this, InventoryAlertService.class));
 
         // Logout button (your branch)
         logoutBtn = findViewById(R.id.logout_button);
         logoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
+            stopService(new Intent(this, InventoryAlertService.class)); // Stop service on logout
             startActivity(new Intent(ParentHomeActivity.this, MainActivity.class));
             finish();
         });
@@ -186,4 +192,3 @@ public class ParentHomeActivity extends AppCompatActivity {
                 });
     }
 }
-
