@@ -8,18 +8,6 @@
     android:focusable="true"
     android:background="#E4F1FF">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp">
-
-        <Button
-            android:id="@+id/settingsBackButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back" />
-    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"

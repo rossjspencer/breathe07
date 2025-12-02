@@ -139,7 +139,7 @@
         android:id="@+id/triage_button"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:backgroundTint="#2196F3"
+        android:backgroundTint="#673AB7"
         android:text="Triage"
         android:layout_marginTop="10dp"
         android:elevation="4dp"
