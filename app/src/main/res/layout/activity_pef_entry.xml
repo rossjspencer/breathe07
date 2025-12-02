@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="32dp"
-    android:background="#DCE8D8">
+    android:background="#E4F1FF">
 
     <!-- Title -->
     <TextView
@@ -70,7 +70,7 @@
         android:layout_width="200dp"
         android:layout_height="50dp"
         android:text="Save PEF"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:background="@drawable/rounded_button" />
 
 </LinearLayout>

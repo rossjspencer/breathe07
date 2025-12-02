@@ -1,20 +1,36 @@
 package com.example.smartair;
 
+import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -22,6 +38,7 @@ public class HistoryActivity extends AppCompatActivity {
     private HistoryAdapter adapter;
     private TextView tvTitle;
     private ImageButton btnFilter;
+    private Button btnExport;
     private DatabaseReference mDatabase;
     private String childId;
     private String childName = "";
@@ -63,6 +80,7 @@ public class HistoryActivity extends AppCompatActivity {
         tvTitle = findViewById(R.id.tvHistoryTitle);
         btnFilter = findViewById(R.id.btnFilter);
         recyclerView = findViewById(R.id.rvHistory);
+        btnExport = findViewById(R.id.btnExport);
         
         if (!childName.isEmpty()) {
             tvTitle.setText("History: " + childName);
@@ -73,6 +91,7 @@ public class HistoryActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         btnFilter.setOnClickListener(v -> showFilterDialog());
+        btnExport.setOnClickListener(v -> showExportOptionsDialog());
 
         if (childId != null) {
             loadLogs();
@@ -217,5 +236,168 @@ public class HistoryActivity extends AppCompatActivity {
             if (options[i].equalsIgnoreCase(value) && selection[i]) return true;
         }
         return false;
+    }
+
+    private void showExportOptionsDialog() {
+        if (filteredLogs.isEmpty()) {
+            Toast.makeText(this, "No logs available to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] options = {"Export as PDF", "Export as CSV"};
+        new AlertDialog.Builder(this)
+            .setTitle("Export History")
+            .setItems(options, (dialog, which) -> {
+                if (which == 0) {
+                    generatePdf();
+                } else {
+                    generateCsv();
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void generatePdf() {
+        PdfDocument doc = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
+        PdfDocument.Page page = doc.startPage(pageInfo);
+        Canvas canvas = page.getCanvas();
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+
+        int margin = 40;
+        int y = 50;
+        int pageHeight = 842;
+
+        // Title
+        paint.setTextSize(18f);
+        paint.setFakeBoldText(true);
+        canvas.drawText("Symptom & Trigger Log History", margin, y, paint);
+        y += 25;
+        
+        paint.setTextSize(14f);
+        paint.setFakeBoldText(false);
+        if (!childName.isEmpty()) {
+            canvas.drawText("Child: " + childName, margin, y, paint);
+            y += 20;
+        }
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy - h:mm a", Locale.getDefault());
+        canvas.drawText("Export Date: " + sdf.format(new Date()), margin, y, paint);
+        y += 40;
+
+        paint.setTextSize(12f);
+        
+        for (SymptomLog log : filteredLogs) {
+            // Check page bounds
+            if (y > pageHeight - 100) {
+                doc.finishPage(page);
+                page = doc.startPage(pageInfo);
+                canvas = page.getCanvas();
+                y = 50;
+            }
+
+            // Draw Log Entry
+            String dateStr = sdf.format(new Date(log.timestamp));
+            String author = (log.loggedBy != null && !log.loggedBy.isEmpty()) ? log.loggedBy : "Unknown";
+            
+            paint.setFakeBoldText(true);
+            canvas.drawText("Date: " + dateStr + "  |  Logged By: " + author, margin, y, paint);
+            y += 15;
+
+            paint.setFakeBoldText(false);
+            canvas.drawText("Severity: " + log.severity + "/10", margin, y, paint);
+            y += 15;
+
+            if (log.symptoms != null && !log.symptoms.isEmpty()) {
+                canvas.drawText("Symptoms: " + String.join(", ", log.symptoms), margin, y, paint);
+                y += 15;
+            }
+            
+            if (log.triggers != null && !log.triggers.isEmpty()) {
+                canvas.drawText("Triggers: " + String.join(", ", log.triggers), margin, y, paint);
+                y += 15;
+            }
+
+            if (log.notes != null && !log.notes.isEmpty()) {
+                canvas.drawText("Notes: " + log.notes, margin, y, paint);
+                y += 15;
+            }
+
+            // Divider
+            Paint linePaint = new Paint();
+            linePaint.setColor(Color.LTGRAY);
+            linePaint.setStrokeWidth(1f);
+            y += 10;
+            canvas.drawLine(margin, y, 595 - margin, y, linePaint);
+            y += 30;
+        }
+
+        doc.finishPage(page);
+
+        String fileName = "logs_export_" + System.currentTimeMillis() + ".pdf";
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
+
+        try {
+            doc.writeTo(new FileOutputStream(file));
+            Toast.makeText(this, "PDF Exported: " + fileName, Toast.LENGTH_LONG).show();
+            openFile(file, "application/pdf");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error exporting PDF", Toast.LENGTH_SHORT).show();
+        } finally {
+            doc.close();
+        }
+    }
+
+    private void generateCsv() {
+        String fileName = "logs_export_" + System.currentTimeMillis() + ".csv";
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.append("Timestamp,Date,Time,LoggedBy,Severity,Symptoms,Triggers,Notes\n");
+
+            SimpleDateFormat dateSdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat timeSdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+            for (SymptomLog log : filteredLogs) {
+                Date date = new Date(log.timestamp);
+                
+                String symptoms = (log.symptoms != null) ? String.join(";", log.symptoms) : "";
+                String triggers = (log.triggers != null) ? String.join(";", log.triggers) : "";
+                String notes = (log.notes != null) ? log.notes.replace("\"", "\"\"").replace("\n", " ") : "";
+                String loggedBy = (log.loggedBy != null) ? log.loggedBy : "Unknown";
+
+                writer.append(String.valueOf(log.timestamp)).append(",")
+                      .append(dateSdf.format(date)).append(",")
+                      .append(timeSdf.format(date)).append(",")
+                      .append("\"").append(loggedBy).append("\",")
+                      .append(String.valueOf(log.severity)).append(",")
+                      .append("\"").append(symptoms).append("\",")
+                      .append("\"").append(triggers).append("\",")
+                      .append("\"").append(notes).append("\"\n");
+            }
+
+            Toast.makeText(this, "CSV Exported: " + fileName, Toast.LENGTH_LONG).show();
+            openFile(file, "text/csv");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error exporting CSV", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openFile(File file, String mimeType) {
+        Uri uri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, mimeType);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No app found to open this file.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

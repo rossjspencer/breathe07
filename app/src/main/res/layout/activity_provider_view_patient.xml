@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#E4F1FF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -65,9 +66,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:backgroundTint="#000080"
             android:text="View Shared Report (if available)"
-            android:textColor="@android:color/black"
-            android:backgroundTint="#E0E0E0" />
+            android:textColor="#FFFFFF" />
 
         <TextView
             android:id="@+id/tv_logs_placeholder"

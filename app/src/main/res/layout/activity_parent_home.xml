@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#E4F1E2">
+    android:background="#E4F1FF">
 
     <!-- Title -->
     <TextView
@@ -15,6 +15,7 @@
         android:text="Parent Dashboard"
         android:textStyle="bold"
         android:textSize="24sp"
+        android:textColor="#000000"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -25,6 +26,7 @@
         android:layout_height="wrap_content"
         android:text="Your linked children:"
         android:layout_marginTop="8dp"
+        android:textColor="#000000"
         app:layout_constraintTop_toBottomOf="@id/tvWelcome"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -41,35 +43,43 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Daily Log Button -->
+
     <Button
         android:id="@+id/log_symptoms_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:text="Daily Symptom/Trigger Log"
         android:textColor="#000000"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#10E6A6"
         app:layout_constraintBottom_toTopOf="@id/btnLinkChild"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rvLinkedChildren" />
 
+    <!-- Register Child Button -->
     <Button
         android:id="@+id/btnLinkChild"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:text="+ Register New Child"
-        android:textColor="#006108"
+        android:textColor="#000000"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#10E6A6"
         app:layout_constraintBottom_toTopOf="@id/logout_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Logout Button -->
     <Button
         android:id="@+id/logout_button"
         android:layout_width="140dp"
         android:layout_height="50dp"
         android:text="Logout"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:background="@drawable/rounded_button"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
