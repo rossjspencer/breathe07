@@ -8,4 +8,6 @@ public class CalendarDay {
         this.dayOfMonth = dayOfMonth;
         this.missedCount = missedCount;
     }
+
+    public static CalendarDay blank() { return new CalendarDay(0, -1); }
 }

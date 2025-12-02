@@ -40,7 +40,7 @@ public class TriageActivity extends AppCompatActivity {
 
         root = FirebaseDatabase.getInstance().getReference();
 
-        // Link Child ID (supports both keys for backward-compat)
+        // Link Child ID
         childId = getIntent().getStringExtra("CHILD_ID");
         if (childId == null) childId = getIntent().getStringExtra("childId");
 

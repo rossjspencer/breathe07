@@ -88,13 +88,13 @@ public class ParentSetPbActivity extends AppCompatActivity {
             return;
         }
 
-        // 1) Write PB
+        // Write PB
         userRef.child("personalBest").setValue(newPb)
                 .addOnSuccessListener(x -> {
                     tvCurrentPb.setText(String.valueOf(newPb));
                     tvInfo.setText("PB updated.");
 
-                    // 2) Optional consistency: recompute currentZone/asthmaScore using latest PEF entry, if any
+                    // Recompute currentZone/asthmaScore using latest PEF entry, if any
                     Query lastPef = userRef.child("pef_entries").orderByChild("timestamp").limitToLast(1);
                     lastPef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
