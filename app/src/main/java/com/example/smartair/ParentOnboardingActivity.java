@@ -18,7 +18,6 @@ public class ParentOnboardingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent_onboarding);
 
-        // 🔒 Security: block access when logged out
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();

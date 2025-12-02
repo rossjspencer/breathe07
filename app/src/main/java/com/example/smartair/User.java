@@ -15,10 +15,9 @@ public class User {
     public String password;
     public String role;
 
-    // ⭐ From your branch (keep this — important for onboarding flow)
     public boolean onboardingComplete = false;
 
-    // ⭐ From main branch — keep all additional fields
+    // From main branch — keep all additional fields
     public String dateOfBirth;
     public String notes;
 
