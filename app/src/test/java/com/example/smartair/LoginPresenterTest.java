@@ -94,4 +94,103 @@ public class LoginPresenterTest {
         presenter.onParentSuccess("Hacker");
         verify(view).showLoginError("Unknown role: Hacker");
     }
+
+    // Input Validation Tests
+    @Test
+    public void handleLogin_NullInput_ShowsInputError() {
+        presenter.handleLogin(null, "password");
+        verify(view).showInputError();
+        verify(model, never()).performParentLogin(any(), any(), any());
+        verify(model, never()).performChildLogin(any(), any(), any());
+    }
+
+    @Test
+    public void handleLogin_NullPassword_ShowsInputError() {
+        presenter.handleLogin("user", null);
+        verify(view).showInputError();
+    }
+
+    @Test
+    public void handleLogin_InputSpacesOnly_ShowsInputError() {
+        presenter.handleLogin("   ", "password");
+        verify(view).showInputError();
+    }
+
+    @Test
+    public void handleLogin_PasswordSpacesOnly_ShowsInputError() {
+        presenter.handleLogin("childUser", "   ");
+        verify(view).showInputError();
+    }
+
+    @Test
+    public void handleLogin_BothSpaces_ShowsInputError() {
+        presenter.handleLogin("   ", "   ");
+        verify(view).showInputError();
+    }
+
+    //Trimming Behavior
+    @Test
+    public void handleLogin_InputWithSpaces_StillRoutesCorrectly() {
+        presenter.handleLogin("   parent@test.com   ", "  pass123  ");
+
+        verify(model).performParentLogin(eq("parent@test.com"), eq("pass123"), eq(presenter));
+    }
+
+    @Test
+    public void handleLogin_ChildWithSpaces_CallsChildLogin() {
+        presenter.handleLogin("   kid123   ", " pass ");
+        verify(model).performChildLogin(eq("kid123"), eq("pass"), eq(presenter));
+    }
+
+    //Roles Edge Cases
+    @Test
+    public void onParentSuccess_NullRole_ShowsUnknownRoleError() {
+        presenter.onParentSuccess(null);
+        verify(view).showLoginError("Unknown role: null");
+    }
+
+    @Test
+    public void onParentSuccess_EmptyRole_ShowsUnknownRoleError() {
+        presenter.onParentSuccess("");
+        verify(view).showLoginError("Unknown role: ");
+    }
+
+    @Test
+    public void onParentSuccess_LowercaseParent_ShowsUnknownRoleError() {
+        presenter.onParentSuccess("parent");
+        verify(view).showLoginError("Unknown role: parent");
+    }
+
+    //Special Characters / Weird Inputs
+    @Test
+    public void handleLogin_WeirdEmailStillCountsAsParent() {
+        presenter.handleLogin("@@@@", "pass");
+        verify(model).performParentLogin(eq("@@@@"), eq("pass"), eq(presenter));
+    }
+
+    @Test
+    public void handleLogin_ChildNumericUsername_StillChild() {
+        presenter.handleLogin("12345", "pass");
+        verify(model).performChildLogin(eq("12345"), eq("pass"), eq(presenter));
+    }
+
+    //Failure Path Variants
+    @Test
+    public void onFailure_EmptyMessage_ShowsLoginError() {
+        presenter.onFailure("");
+        verify(view).showLoginError("");
+    }
+
+    @Test
+    public void onFailure_NullMessage_ShowsLoginError() {
+        presenter.onFailure(null);
+        verify(view).showLoginError(null);
+    }
+
+    //Behavior Separation
+    @Test
+    public void handleLogin_PasswordContainsAtButInputDecidesParent() {
+        presenter.handleLogin("parent@test.com", "p@ssword");
+        verify(model).performParentLogin(eq("parent@test.com"), eq("p@ssword"), eq(presenter));
+    }
 }
