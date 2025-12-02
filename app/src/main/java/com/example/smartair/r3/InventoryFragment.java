@@ -90,7 +90,6 @@ public class InventoryFragment extends Fragment {
         controllerButton = view.findViewById(R.id.inventoryControllerButton);
         rescueButton = view.findViewById(R.id.inventoryRescueButton);
         addItemButton = view.findViewById(R.id.inventoryAddButton);
-        backButton = view.findViewById(R.id.backButton);
 
         displayHandler = new InventoryDisplayHandler();
         displayHandler.setOnDeleteClickListener(this::showDeleteConfirmDialog);
