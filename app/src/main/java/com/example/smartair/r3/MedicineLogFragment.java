@@ -141,7 +141,6 @@ public class MedicineLogFragment extends Fragment {
         loadLogsFromFirebase();
 
         RecyclerView recyclerView = view.findViewById(R.id.logRecyclerView);
-        Button backButton = view.findViewById(R.id.backButton);
         controllerButton = view.findViewById(R.id.controllerButton);
         rescueButton = view.findViewById(R.id.rescueButton);
         Button addEntryButton = view.findViewById(R.id.addEntryButton);
@@ -166,12 +165,6 @@ public class MedicineLogFragment extends Fragment {
             showRescueLogs();
         }
 
-        backButton.setOnClickListener(v -> {
-            // if embedded in an activity that handles back, strictly finish() or pop
-            if (getActivity() != null) {
-                getActivity().getOnBackPressedDispatcher().onBackPressed();
-            }
-        });
         
         addEntryButton.setOnClickListener(v -> showAddLogDialog());
 

@@ -24,8 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 
 
 public class ParentHomeActivity extends AppCompatActivity {
-
-    // Your branch
     private Button logoutBtn;
 
     // Main branch

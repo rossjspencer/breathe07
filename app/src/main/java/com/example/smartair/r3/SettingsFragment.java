@@ -36,7 +36,6 @@ public class SettingsFragment extends Fragment {
             }
         }
 
-        Button backButton = view.findViewById(R.id.settingsBackButton);
         EditText editBadge1 = view.findViewById(R.id.editBadge1Threshold);
         EditText editBadge3 = view.findViewById(R.id.editBadge3Threshold);
         Button saveButton = view.findViewById(R.id.btnSaveSettings);
@@ -58,11 +57,6 @@ public class SettingsFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        backButton.setOnClickListener(v -> {
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            }
-        });
 
         saveButton.setOnClickListener(v -> {
             String b1Text = editBadge1.getText().toString().trim();

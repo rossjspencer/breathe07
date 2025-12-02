@@ -112,7 +112,7 @@ app:cardElevation="4dp">
                 android:layout_height="45dp"
                 android:text="Manage"
                 android:textSize="12sp"
-                android:backgroundTint="#757575"
+                android:backgroundTint="#000080"
                 android:layout_marginStart="4dp"/>
         </LinearLayout>
 

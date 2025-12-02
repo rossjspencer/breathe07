@@ -91,8 +91,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Filter by Symptoms"
-        android:backgroundTint="#E0E0E0"
-        android:textColor="#333333"
+        android:backgroundTint="#000080"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="8dp"/>
 
     <Button
@@ -100,7 +100,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Filter by Triggers"
-        android:backgroundTint="#E0E0E0"
-        android:textColor="#333333"/>
+        android:backgroundTint="#000080"
+        android:textColor="#FFFFFF"/>
 
 </LinearLayout>

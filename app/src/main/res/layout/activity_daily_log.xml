@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    android:background="@color/light_blue_bg">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -133,6 +133,7 @@
             android:layout_height="wrap_content"
             android:text="Save Log"
             android:textColor="#000000"
+            android:backgroundTint="#10E6A6"
             android:layout_marginTop="24dp"/>
 
         <Button

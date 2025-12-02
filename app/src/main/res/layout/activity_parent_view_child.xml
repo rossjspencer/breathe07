@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#E4F1FF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="At-a-glance tiles update live from the child dashboard."
-            android:textColor="#616161" />
+            android:textColor="#000000" />
 
         <GridLayout
             android:id="@+id/gridTiles"
@@ -338,7 +339,7 @@
             android:text="Badge Settings"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:backgroundTint="#7B1FA2" />
+            android:backgroundTint="#000080" />
 
         <Button
             android:id="@+id/btn_set_pb"
