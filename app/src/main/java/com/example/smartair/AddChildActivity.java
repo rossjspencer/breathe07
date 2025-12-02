@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class AddChildActivity extends AppCompatActivity {
 
@@ -20,7 +24,6 @@ public class AddChildActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_child);
 
-        // Establish Firebase Database reference
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         etFirstName = findViewById(R.id.child_firstname);
@@ -33,49 +36,57 @@ public class AddChildActivity extends AppCompatActivity {
     }
 
     private void registerChild() {
-        // Clean inputs
         String first = etFirstName.getText().toString().trim();
         String last = etLastName.getText().toString().trim();
         String user = etUsername.getText().toString().trim();
         String pass = etPassword.getText().toString().trim();
 
-        // Check if inputs are empty
         if (first.isEmpty() || last.isEmpty() || user.isEmpty() || pass.isEmpty()) {
             Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Generate id for new child
+        mDatabase.child("users").orderByChild("email").equalTo(user)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // Username found in DB -> It is taken
+                            Toast.makeText(AddChildActivity.this, "Username '" + user + "' is already taken.", Toast.LENGTH_LONG).show();
+                        } else {
+                            // Username is unique -> Proceed with creation
+                            performCreation(first, last, user, pass);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(AddChildActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void performCreation(String first, String last, String user, String pass) {
         String newChildId = mDatabase.child("users").push().getKey();
         String currentParentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         if (newChildId != null && currentParentId != null) {
-
-            // --- FIX APPLIED HERE ---
-            // Use the new 3-argument constructor: ID, Role, Username (stored in email field)
             User newChild = new User(newChildId, "Child", user);
 
-            // Set remaining fields manually
             newChild.firstName = first;
             newChild.lastName = last;
             newChild.password = pass;
 
-            // Writes new user to database AND waits before linking
             mDatabase.child("users").child(newChildId).setValue(newChild)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            // Link to Parent
                             mDatabase.child("users").child(currentParentId)
                                     .child("linkedChildren").child(newChildId).setValue(true);
-                            
-                            // Store creation date in guide_stats
-                            String today = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(new java.util.Date());
-                            mDatabase.getRoot().child("guide_stats").child(newChildId).child("accountCreationDate").setValue(today);
 
-                            Toast.makeText(this, "Child Registered & Linked!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddChildActivity.this, "Child Registered & Linked!", Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
-                            Toast.makeText(this, "Failed to create profile", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddChildActivity.this, "Failed to create profile", Toast.LENGTH_SHORT).show();
                         }
                     });
         }

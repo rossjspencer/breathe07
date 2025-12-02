@@ -12,7 +12,7 @@
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Parent Dashboard"
+        android:text="Overview"
         android:textStyle="bold"
         android:textSize="24sp"
         app:layout_constraintTop_toTopOf="parent"
