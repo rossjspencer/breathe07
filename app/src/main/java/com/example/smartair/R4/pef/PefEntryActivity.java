@@ -88,22 +88,22 @@ public class PefEntryActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Compute zone using PB (Green ≥80%, Yellow 50–79%, Red <50%) :contentReference[oaicite:2]{index=2}
+                // Compute zone using PB
                 String previousZoneStr = snap.child("currentZone").getValue(String.class);
                 AsthmaZone newZone = zoneCalculator.computeZone(pefValue, personalBest);
                 String newZoneStr = newZone.name();
                 long now = System.currentTimeMillis();
 
-                // 1) Log PEF entry
+                // Log PEF entry
                 DatabaseReference pefRef = userRef.child("pef_entries").push();
                 String pefId = pefRef.getKey();
                 PefEntry entry = new PefEntry(pefId, childId, now, pefValue, preMed);
                 pefRef.setValue(entry);
 
-                // 2) Update current zone (PB is NOT changed here)
+                // Update current zone
                 userRef.child("currentZone").setValue(newZoneStr);
 
-                // 3) Zone-change history if changed
+                // Zone-change history if changed
                 if (previousZoneStr == null || !previousZoneStr.equals(newZoneStr)) {
                     DatabaseReference zRef = userRef.child("zone_changes").push();
                     String zoneId = zRef.getKey();
@@ -118,7 +118,7 @@ public class PefEntryActivity extends AppCompatActivity {
                     zRef.setValue(z);
                 }
 
-                // 4) Update percent for dashboard (for your existing UI)
+                // Update percent for dashboard
                 int percent = (int) Math.round((pefValue * 100.0) / personalBest);
                 if (percent < 0) percent = 0;
                 if (percent > 100) percent = 100;

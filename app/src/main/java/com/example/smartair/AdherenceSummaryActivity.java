@@ -65,6 +65,10 @@ public class AdherenceSummaryActivity extends AppCompatActivity {
         rvCalendar.setLayoutManager(new GridLayoutManager(this, 7));
         calendarAdapter = new CalendarAdapter(calendarList);
         rvCalendar.setAdapter(calendarAdapter);
+        rvCalendar.setLayoutManager(new GridLayoutManager(this, 7));
+        rvCalendar.setHasFixedSize(false);
+        rvCalendar.setNestedScrollingEnabled(false); // even if set in XML, set here too
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d", Locale.getDefault());
         tvDateSubtitle.setText("Today is " + sdf.format(new Date()));
@@ -181,74 +185,85 @@ public class AdherenceSummaryActivity extends AppCompatActivity {
 
     private void calculateMonthlyAdherence() {
         calendarList.clear();
-        
+
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
         today.set(Calendar.MILLISECOND, 0);
-        
+
         Calendar cal = (Calendar) today.clone();
-        cal.set(Calendar.DAY_OF_MONTH, 1); 
-        
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+
         int maxDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         int startDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        
-        // placeholders
+
         for (int i = 1; i < startDayOfWeek; i++) {
-            calendarList.add(new CalendarDay(0, -1)); 
+            calendarList.add(new CalendarDay(0, -1));  // real blank grid cell
         }
-        
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat fullSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
         Map<String, Integer> dailyCount = new HashMap<>();
-        
+
+        // Build actual logs map
         for (ControllerLogEntry log : controllerLogs) {
             if (log.timestamp == null) continue;
+
             try {
                 Date d = fullSdf.parse(log.timestamp);
                 if (d != null) {
                     String key = sdf.format(d);
                     dailyCount.put(key, dailyCount.getOrDefault(key, 0) + log.doseCount);
                 }
-            } catch (ParseException e) {}
+            } catch (ParseException ignored) {}
         }
-        
+
         int totalMissed = 0;
-        
+
         for (int i = 1; i <= maxDays; i++) {
+
             cal.set(Calendar.DAY_OF_MONTH, i);
-            
+
+            // FUTURE DAYS → show day number but muted
             if (cal.after(today)) {
-                calendarList.add(new CalendarDay(i, -1)); 
+                calendarList.add(new CalendarDay(i, -2));   // ← -2 = FUTURE DAY
                 continue;
             }
-            
+
+            // PAST/TODAY
             String dayKey = sdf.format(cal.getTime());
             int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
             String schedKey = getDayShortCode(dayOfWeek);
-            
+
             int planned = plannedSchedule.getOrDefault(schedKey, 0);
             int actual = dailyCount.getOrDefault(dayKey, 0);
+
             int missed = Math.max(0, planned - actual);
-            
             if (planned == 0) missed = 0;
+
             if (missed > 0) totalMissed++;
-            
+
             calendarList.add(new CalendarDay(i, missed));
         }
-        
+
+        while (calendarList.size() % 7 != 0) {
+            calendarList.add(new CalendarDay(0, -1));
+        }
+
         calendarAdapter.notifyDataSetChanged();
-        
+
         if (totalMissed == 0) {
             tvMonthlySuccess.setVisibility(View.VISIBLE);
-            rvCalendar.setVisibility(View.VISIBLE); 
         } else {
             tvMonthlySuccess.setVisibility(View.GONE);
-            rvCalendar.setVisibility(View.VISIBLE);
         }
+
+        rvCalendar.setVisibility(View.VISIBLE);
     }
-    
+
+
     private String getDayName(int day) {
         return new java.text.DateFormatSymbols().getWeekdays()[day];
     }

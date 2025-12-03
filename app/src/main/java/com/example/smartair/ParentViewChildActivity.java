@@ -104,7 +104,6 @@ public class ParentViewChildActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh time-based calculations and single-fetch data
         if (childProfile != null) {
             updateAdherenceTile();
             checkAlerts();
@@ -781,7 +780,6 @@ public class ParentViewChildActivity extends AppCompatActivity {
             // Happens if no permission — ignore
         }
     }
-
 
 
 
