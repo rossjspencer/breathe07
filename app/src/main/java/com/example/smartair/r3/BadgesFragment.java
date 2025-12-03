@@ -360,43 +360,70 @@ public class BadgesFragment extends Fragment {
                 } catch (Exception e) {}
             }
         }
-        
+
         // calculate current streak
         int currentStreak = 0;
-        Calendar iter = (Calendar) cal.clone();
-        
-        // logic to calculate streak from today backward
+
         int backStreak = 0;
         Calendar backIter = (Calendar) cal.clone();
-        backIter.add(Calendar.DAY_OF_YEAR, -1); // Yesterday
-        
-        // limit lookback to 365 days or until break
+        backIter.add(Calendar.DAY_OF_YEAR, -1);
+
+        // flag indicating if the streak has "started" yet
+        boolean streakStarted = false;
+
+        // limit lookback to 365 days
         for (int i = 0; i < 365; i++) {
+
             String key = sdf.format(backIter.getTime());
             int dw = backIter.get(Calendar.DAY_OF_WEEK);
             String ds = getDayShortCode(dw);
-            int p = schedule.getOrDefault(ds, 0);
-            int a = dailyCount.getOrDefault(key, 0);
-            
-            if (a >= p) {
-                backStreak++;
+
+            int planned = schedule.getOrDefault(ds, 0);
+            int actual = dailyCount.getOrDefault(key, 0);
+
+            boolean adherent = actual >= planned;
+
+            if (!streakStarted) {
+                // first day must:
+                // 1. be a controller day (planned > 0)
+                // 2. be adherent
+                if (planned > 0 && adherent) {
+                    streakStarted = true;
+                    backStreak++;
+                } else {
+                    // streak cannot start
+                    break;
+                }
             } else {
-                break;
+                // after first day, normal adherence rules
+                if (adherent) {
+                    backStreak++;
+                } else {
+                    break;
+                }
             }
+
             backIter.add(Calendar.DAY_OF_YEAR, -1);
         }
-        
+
         // check today
         String tKey = sdf.format(cal.getTime());
         int tDw = cal.get(Calendar.DAY_OF_WEEK);
         String tDs = getDayShortCode(tDw);
-        int tP = schedule.getOrDefault(tDs, 0);
-        int tA = dailyCount.getOrDefault(tKey, 0);
-        
-        if (tA >= tP) {
+        int tPlanned = schedule.getOrDefault(tDs, 0);
+        int tActual  = dailyCount.getOrDefault(tKey, 0);
+
+        boolean todayAdherent = tActual >= tPlanned;
+
+        // today extends the streak ONLY if the streak behind it was valid
+        if (streakStarted && todayAdherent) {
             currentStreak = backStreak + 1;
-        } else {
+        } else if (streakStarted) {
+            // streak valid but today not adherent
             currentStreak = backStreak;
+        } else {
+            // no valid streak start
+            currentStreak = 0;
         }
         
         // update text
