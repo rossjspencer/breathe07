@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 
 import com.example.smartair.R4.model.TriageIncident;
+
 import com.example.smartair.R4.triage.ActionPlanActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -74,15 +75,6 @@ public class ParentViewChildActivity extends AppCompatActivity {
     private AlertHelper alertHelper;
 
     private Button btnSetPb;
-
-    //Triage Notification
-    private static final String PREFS_TRIAGE = "triage_prefs";
-    private static String keySeen(String cid) { return "triage_seen_ts_" + cid; }
-    private static String keyEsc(String cid)  { return "triage_esc_seen_ts_" + cid; }
-
-    private DatabaseReference triageRef;
-    private ChildEventListener triageListener;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -734,64 +726,40 @@ public class ParentViewChildActivity extends AppCompatActivity {
         }
     }
     private void listenForTriageUpdates() {
-        if (triageListener != null) return; // already attached
-
-        long lastSeenTs = getSharedPreferences(PREFS_TRIAGE, MODE_PRIVATE)
-                .getLong(keySeen(childId), 0L);
-
-        triageRef = FirebaseDatabase.getInstance()
+        DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("children_triage_incidents")
                 .child(childId);
 
-        com.google.firebase.database.Query q =
-                triageRef.orderByChild("timestampMillis").startAt(lastSeenTs + 1);
-
-        triageListener = new ChildEventListener() {
-            @Override public void onChildAdded(@NonNull DataSnapshot snap, String prev) {
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snap, String prev) {
                 TriageIncident inc = snap.getValue(TriageIncident.class);
-                if (inc == null || inc.timestampMillis == 0L) return;
-
-                // Notify once for new session
-                showTriageNotification("New triage session started");
-
-                getSharedPreferences(PREFS_TRIAGE, MODE_PRIVATE)
-                        .edit().putLong(keySeen(childId), inc.timestampMillis).apply();
+                if (inc != null) {
+                    showTriageNotification("New triage session started");
+                }
             }
 
-            @Override public void onChildChanged(@NonNull DataSnapshot snap, String prev) {
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snap, String prev) {
                 TriageIncident inc = snap.getValue(TriageIncident.class);
-                if (inc == null || inc.timestampMillis == 0L) return;
-
-                if (inc.escalated) {
-                    long lastEscTs = getSharedPreferences(PREFS_TRIAGE, MODE_PRIVATE)
-                            .getLong(keyEsc(childId), 0L);
-
-                    if (inc.timestampMillis > lastEscTs) {
-                        showTriageNotification("Triage escalation detected!");
-                        getSharedPreferences(PREFS_TRIAGE, MODE_PRIVATE)
-                                .edit().putLong(keyEsc(childId), inc.timestampMillis).apply();
-                    }
+                if (inc != null && Boolean.TRUE.equals(inc.escalated)) {
+                    showTriageNotification("Triage escalation detected!");
                 }
             }
 
             @Override public void onChildRemoved(@NonNull DataSnapshot snap) {}
             @Override public void onChildMoved(@NonNull DataSnapshot snap, String prev) {}
             @Override public void onCancelled(@NonNull DatabaseError error) {}
-        };
-
-        q.addChildEventListener(triageListener);
+        });
     }
 
     private void showTriageNotification(String message) {
-        showTriageNotification(message, /*replaceExisting=*/true, /*withTapAction=*/true);
-    }
 
-    private void showTriageNotification(String message, boolean replaceExisting, boolean withTapAction) {
         // Android 13+ permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
-                return;
+                return; // Don’t crash; silently skip
             }
         }
 
@@ -800,32 +768,17 @@ public class ParentViewChildActivity extends AppCompatActivity {
                         .setSmallIcon(android.R.drawable.ic_dialog_alert)
                         .setContentTitle("Triage Update")
                         .setContentText(message)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setOnlyAlertOnce(replaceExisting)   // don't re-sound if we reuse the same id
                         .setAutoCancel(true);
 
-        if (withTapAction) {
-            Intent intent = new Intent(this, ParentViewChildActivity.class);
-            intent.putExtra("CHILD_ID", childId);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            int reqCode = ("triage_tap_" + childId).hashCode();
-            android.app.PendingIntent pi = android.app.PendingIntent.getActivity(
-                    this, reqCode, intent,
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                            ? android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
-                            : android.app.PendingIntent.FLAG_UPDATE_CURRENT
-            );
-            builder.setContentIntent(pi);
-        }
-
-        final int notifId = replaceExisting
-                ? ("triage_" + childId).hashCode()
-                : (int) (System.currentTimeMillis() & 0x7fffffff);
+        // Unique ID
+        int notifId = (int) (System.currentTimeMillis() & 0xfffffff);
 
         try {
             NotificationManagerCompat.from(this).notify(notifId, builder.build());
-        } catch (SecurityException ignored) { }
+        } catch (SecurityException ignored) {
+            // Happens if no permission — ignore
+        }
     }
 
 
@@ -840,13 +793,4 @@ public class ParentViewChildActivity extends AppCompatActivity {
             return 0;
         }
     }
-
-    @Override protected void onDestroy() {
-        if (triageRef != null && triageListener != null) {
-            triageRef.removeEventListener(triageListener);
-        }
-        triageListener = null;
-        super.onDestroy();
-    }
-
 }

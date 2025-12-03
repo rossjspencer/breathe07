@@ -3,11 +3,15 @@ package com.example.smartair.r3;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -135,70 +139,100 @@ public class InhalerLogPromptFragment extends Fragment {
                     .show();
         });
 
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Add Log")
                 .setView(dialogView)
-                .setPositiveButton("Save", (dialog, which) -> {
-                    String doseText = editDose.getText().toString().trim();
+                .setPositiveButton("Save", null)
+                .setNegativeButton("Cancel", null)
+                .create();
 
-                    String selectedInhaler = null;
-                    if (spinnerInhalerName.getSelectedItem() != null) {
-                        String selection = spinnerInhalerName.getSelectedItem().toString();
-                        // check if it's the empty placeholder
-                        if (!selection.equals("No inhalers of this type in Inventory.")) {
-                            selectedInhaler = selection;
-                        }
-                    }
+        dialog.show();
 
-                    if (doseText.isEmpty()) {
-                        Toast.makeText(getContext(), "Please enter dose", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        // disable the positive button initially
+        Button positiveButton = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setEnabled(false);
+        positiveButton.setTextColor(Color.GRAY);
 
-                    if (selectedInhaler == null || selectedInhaler.isEmpty()) {
-                        Toast.makeText(getContext(), "Please select an inhaler", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        // listener to validate inputs
+        Runnable validateInputs = () -> {
+            String doseText = editDose.getText().toString().trim();
+            boolean hasDose = !doseText.isEmpty();
+            
+            boolean hasInhaler = false;
+            if (spinnerInhalerName.getSelectedItem() != null) {
+                String selection = spinnerInhalerName.getSelectedItem().toString();
+                if (!selection.equals("No inhalers of this type in Inventory.")) {
+                    hasInhaler = true;
+                }
+            }
 
-                    int dose;
-                    try {
-                        dose = Integer.parseInt(doseText);
-                    } catch (NumberFormatException e) {
-                        return;
-                    }
+            if (hasDose && hasInhaler) {
+                positiveButton.setEnabled(true);
+                positiveButton.setTextColor(Color.BLUE);
+            } else {
+                positiveButton.setEnabled(false);
+                positiveButton.setTextColor(Color.GRAY);
+            }
+        };
 
-                    // get current time and use for timestamp
-                    String timestamp = new java.text.SimpleDateFormat(
-                            "yyyy-MM-dd HH:mm",
-                            java.util.Locale.getDefault()
-                    ).format(new java.util.Date());
+        editDose.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { validateInputs.run(); }
+            @Override public void afterTextChanged(Editable s) {}
+        });
 
-                    LogType type;
-                    int checkedId = typeGroup.getCheckedRadioButtonId();
-                    if (checkedId == R.id.radioRescue) {
-                        type = LogType.RESCUE;
-                    } else {
-                        type = LogType.CONTROLLER;
-                    }
+        spinnerInhalerName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                validateInputs.run();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
-                    if (type == LogType.CONTROLLER) {
-                        ControllerLogEntry entry = new ControllerLogEntry(selectedInhaler, dose, timestamp);
+        // set the click listener for the positive button
+        positiveButton.setOnClickListener(v -> {
+            String doseText = editDose.getText().toString().trim();
+            String selectedInhaler = spinnerInhalerName.getSelectedItem().toString();
 
-                        DatabaseReference typeRef = logReference.child("controller")
-                                .child(currentUserId);
-                        String key = typeRef.push().getKey();
-                        entry.id = key;
-                        if (key != null) {
-                            typeRef.child(key).setValue(entry);
-                        }
-                        
-                        updateInventoryDose(selectedInhaler, dose, "controller");
+            int dose;
+            try {
+                dose = Integer.parseInt(doseText);
+            } catch (NumberFormatException e) {
+                return;
+            }
 
-                    } else {
-                        RescueLogEntry entry = new RescueLogEntry(selectedInhaler, dose, timestamp);
+            // get current time and use for timestamp
+            String timestamp = new java.text.SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm",
+                    java.util.Locale.getDefault()
+            ).format(new java.util.Date());
 
-                        DatabaseReference typeRef = logReference.child("rescue")
-                                .child(currentUserId);
+            LogType type;
+            int checkedId = typeGroup.getCheckedRadioButtonId();
+            if (checkedId == R.id.radioRescue) {
+                type = LogType.RESCUE;
+            } else {
+                type = LogType.CONTROLLER;
+            }
+
+            if (type == LogType.CONTROLLER) {
+                ControllerLogEntry entry = new ControllerLogEntry(selectedInhaler, dose, timestamp);
+
+                DatabaseReference typeRef = logReference.child("controller")
+                        .child(currentUserId);
+                String key = typeRef.push().getKey();
+                entry.id = key;
+                if (key != null) {
+                    typeRef.child(key).setValue(entry);
+                }
+                
+                updateInventoryDose(selectedInhaler, dose, "controller");
+
+            } else {
+                RescueLogEntry entry = new RescueLogEntry(selectedInhaler, dose, timestamp);
+
+                DatabaseReference typeRef = logReference.child("rescue")
+                        .child(currentUserId);
                         String key = typeRef.push().getKey();
                         entry.id = key;
                         if (key != null) {
@@ -208,11 +242,10 @@ public class InhalerLogPromptFragment extends Fragment {
                         updateInventoryDose(selectedInhaler, dose, "rescue");
                     }
                     
+                    dialog.dismiss();
                     // after saving, proceed to the post check screen
                     navigateToPostCheck();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        });
     }
 
     private void updateSpinner(Spinner spinner, LogType type) {

@@ -60,7 +60,7 @@
                 android:id="@+id/tvCurrentZone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="--%"
+                android:text="--"
                 android:textSize="48sp"
                 android:textStyle="bold"
                 android:layout_marginVertical="8dp"
@@ -86,34 +86,14 @@
         android:textStyle="bold"
         android:elevation="8dp"
         android:backgroundTint="#4CAF50"
-        android:layout_marginBottom="24dp" />
-
-    <Button
-        android:id="@+id/btnLogPef"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Log Peak Flow"
-        android:textSize="18sp"
-        android:layout_marginTop="0dp"
-        android:elevation="4dp"
-        android:backgroundTint="#2196F3" />
-
-    <Button
-        android:id="@+id/btnLogSymptoms"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Daily Triggers/Symptoms Log"
-        android:textSize="18sp"
-        android:backgroundTint="#2196F3"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="12dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_marginBottom="16dp">
+        android:layout_marginTop="12dp">
 
         <Button
             android:id="@+id/btnViewRescueLog"
@@ -122,7 +102,7 @@
             android:layout_weight="1"
             android:text="View Rescue Log"
             android:textSize="14sp"
-            android:backgroundTint="#1565C0"
+            android:backgroundTint="#C62828"
             android:layout_marginEnd="4dp" />
 
         <Button
@@ -137,12 +117,35 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/btnLogPef"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Log Peak Flow"
+        android:textSize="18sp"
+        android:layout_marginTop="12dp"
+        android:elevation="4dp"
+        android:backgroundTint="#81D4FA"
+        android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/btnLogSymptoms"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Daily Triggers/Symptoms Log"
+        android:textSize="18sp"
+        android:backgroundTint="#4FC3F7"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp" />
+
+    <Button
         android:id="@+id/btnViewHistory"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="View History"
         android:textSize="18sp"
-        android:backgroundTint="#000080" />
+        android:backgroundTint="#29B6F6"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp"/>
 
     <Button
         android:id="@+id/btnAwards"
@@ -150,18 +153,19 @@
         android:layout_height="60dp"
         android:text="Awards"
         android:textSize="18sp"
-        android:backgroundTint="#FF9800"
-        android:layout_marginTop="10dp" />
+        android:backgroundTint="#03A9F4"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp" />
 
     <Button
         android:id="@+id/triage_button"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:backgroundTint="#673AB7"
+        android:backgroundTint="#039BE5"
+        android:textColor="@android:color/white"
         android:text="Triage"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:elevation="4dp"
         android:textSize="18sp" />
-
 
 </LinearLayout>
