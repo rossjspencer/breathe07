@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.smartair.r3.ControllerLogEntry;
+import com.example.smartair.r3.RescueLogEntry;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,15 +47,17 @@ public class ProviderReportActivity extends AppCompatActivity {
     private final Map<String, Boolean> sharingSettings = new HashMap<>();
     private final List<RescueLog> rescueLogs = new ArrayList<>();
     private final List<ControllerLog> controllerLogs = new ArrayList<>();
+    private final List<RescueLogEntry> rescueLogEntries = new ArrayList<>();
+    private final List<ControllerLogEntry> controllerLogEntries = new ArrayList<>();
     private final List<ZoneSample> zoneSamples = new ArrayList<>();
     private final List<TriageNote> triageNotes = new ArrayList<>();
     private final List<SymptomLog> symptomLogs = new ArrayList<>();
+    private final Map<String, Integer> plannedSchedule = new HashMap<>();
 
     public static void launch(Context context, String childId, int suggestedRangeDays) {
         Intent intent = new Intent(context, ProviderReportActivity.class);
         intent.putExtra(EXTRA_CHILD_ID, childId);
         long now = System.currentTimeMillis();
-        // Default to 3 months (approx 90 days) prior, regardless of caller preference
         long start = now - 90L * 24 * 60 * 60 * 1000;
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         intent.putExtra("startPrefill", df.format(new Date(start)));
@@ -80,7 +84,6 @@ public class ProviderReportActivity extends AppCompatActivity {
         btnGenerate = findViewById(R.id.btnGeneratePdf);
         btnViewPdf = findViewById(R.id.btnViewPdf);
 
-        // Prefill date range suggestion
         if (getIntent().hasExtra("startPrefill")) {
             etStart.setText(getIntent().getStringExtra("startPrefill"));
         }
@@ -187,20 +190,49 @@ public class ProviderReportActivity extends AppCompatActivity {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
+
+        mDatabase.child("users").child(childId).child("symptomLogs")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        symptomLogs.clear();
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            SymptomLog log = child.getValue(SymptomLog.class);
+                            if (log != null) symptomLogs.add(log);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+
+        mDatabase.child("users").child(childId).child("plannedSchedule")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        plannedSchedule.clear();
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            Integer val = child.getValue(Integer.class);
+                            if (val != null) plannedSchedule.put(child.getKey(), val);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     private void fetchAndGenerateReport() {
-        // Pull fresh data each time to ensure counts/charts are accurate
         final List<RescueLog> rescues = new ArrayList<>();
         final List<ControllerLog> controllers = new ArrayList<>();
+        final List<RescueLogEntry> rescueEntries = new ArrayList<>();
+        final List<ControllerLogEntry> controllerEntries = new ArrayList<>();
         final List<ZoneSample> zones = new ArrayList<>();
         final List<TriageNote> triage = new ArrayList<>();
-        final int[] pending = {5};
+        final int[] pending = {7};
 
         Runnable tryFinish = () -> {
             pending[0]--;
             if (pending[0] == 0) {
-                generateReport(rescues, controllers, zones, triage);
+                generateReport(rescues, controllers, rescueEntries, controllerEntries, zones, triage);
             }
         };
 
@@ -271,9 +303,42 @@ public class ProviderReportActivity extends AppCompatActivity {
                     }
                     @Override public void onCancelled(@NonNull DatabaseError error) { tryFinish.run(); }
                 });
+
+        // Dashboard data source: medicine_logs
+        DatabaseReference meds = FirebaseDatabase
+                .getInstance("https://smartair-a6669-default-rtdb.firebaseio.com")
+                .getReference("medicine_logs");
+
+        meds.child("rescue").child(childId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        rescueEntries.clear();
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            RescueLogEntry log = child.getValue(RescueLogEntry.class);
+                            if (log != null) rescueEntries.add(log);
+                        }
+                        tryFinish.run();
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) { tryFinish.run(); }
+                });
+
+        meds.child("controller").child(childId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        controllerEntries.clear();
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            ControllerLogEntry log = child.getValue(ControllerLogEntry.class);
+                            if (log != null) controllerEntries.add(log);
+                        }
+                        tryFinish.run();
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) { tryFinish.run(); }
+                });
     }
 
-    private void generateReport(List<RescueLog> rescues, List<ControllerLog> controllers, List<ZoneSample> zones, List<TriageNote> triage) {
+    private void generateReport(List<RescueLog> rescues, List<ControllerLog> controllers,
+                                List<RescueLogEntry> rescueEntries, List<ControllerLogEntry> controllerEntries,
+                                List<ZoneSample> zones, List<TriageNote> triage) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         long startMillis;
         long endMillis;
@@ -298,19 +363,25 @@ public class ProviderReportActivity extends AppCompatActivity {
 
         boolean sharingOn = sharingSettings.getOrDefault("isShared", false);
 
-        List<RescueLog> filteredRescues = filterRescues(rescues, startMillis, endMillis);
+        List<Long> rescueTs = buildRescueTimestamps(rescueEntries, rescues);
+        int windowRescues = countTsInRange(rescueTs, startMillis, endMillis);
+        int weeklyRescue = countTsInRange(rescueTs, endMillis - 7L * 24 * 60 * 60 * 1000, endMillis);
+
         List<ZoneSample> filteredZones = filterZones(zones, startMillis, endMillis);
-        // Use a shorter adherence window (last 30 days) to better match dashboard behavior
-        long last30Start = endMillis - 30L * 24 * 60 * 60 * 1000;
-        double adherence = calculateAdherence(controllers, last30Start, endMillis);
-        int symptomBurden = countSymptomBurden(symptomLogs, startMillis, endMillis);
-        int weeklyRescue = countRescues(rescues, endMillis - 7L * 24 * 60 * 60 * 1000, endMillis);
-        // Build zone distribution over time (daily) within window
         List<ZoneSample> dailyZones = buildDailyZoneSamples(filteredZones, startMillis, endMillis);
         if (dailyZones.isEmpty()) {
             int score = childProfile != null ? childProfile.asthmaScore : 0;
             dailyZones.add(new ZoneSample(System.currentTimeMillis(), score));
         }
+
+        long last30Start = endMillis - 30L * 24 * 60 * 60 * 1000;
+        double adherence = calculateAdherenceEntries(controllerEntries, plannedSchedule, last30Start, endMillis);
+        if (adherence < 0) {
+            adherence = calculateAdherence(controllers, last30Start, endMillis);
+        }
+
+        int symptomBurden = countSymptomBurden(symptomLogs, startMillis, endMillis);
+        int notable = countEscalations(triage, startMillis, endMillis);
 
         PdfDocument doc = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
@@ -337,21 +408,19 @@ public class ProviderReportActivity extends AppCompatActivity {
             y += 24;
         }
 
-        canvas.drawText("Rescue uses (window): " + filteredRescues.size(), 40, y, paint); y += 18;
+        canvas.drawText("Rescue uses (window): " + windowRescues, 40, y, paint); y += 18;
         canvas.drawText("Rescue uses (last 7 days): " + weeklyRescue, 40, y, paint); y += 18;
         canvas.drawText("Controller adherence (last 30 days): " + String.format(Locale.getDefault(), "%.0f%%", adherence), 40, y, paint); y += 18;
         canvas.drawText("Symptom burden (problem days): " + symptomBurden, 40, y, paint); y += 18;
-        int notable = countEscalations(triage, startMillis, endMillis);
         canvas.drawText("Notable triage incidents: " + notable, 40, y, paint); y += 18;
 
-        // Always render charts for the exported PDF so parents can share them deliberately
         y += 12;
         canvas.drawText("Zone distribution", 40, y, paint); y += 10;
         drawZoneBars(canvas, y, dailyZones);
         y += 140;
 
         canvas.drawText("Rescue frequency (last 30 days)", 40, y, paint); y += 10;
-        drawRescueSeries(canvas, y, filteredRescues, endMillis);
+        drawRescueSeries(canvas, y, rescueTs, endMillis);
 
         doc.finishPage(page);
 
@@ -360,10 +429,9 @@ public class ProviderReportActivity extends AppCompatActivity {
             doc.writeTo(fos);
             tvStatus.setText("Report saved: " + out.getAbsolutePath());
             btnViewPdf.setEnabled(true);
-            // Persist lightweight metadata so providers can see that a report exists
             Map<String, Object> meta = new HashMap<>();
             meta.put("generatedAt", System.currentTimeMillis());
-            meta.put("rescueCount", filteredRescues.size());
+            meta.put("rescueCount", windowRescues);
             meta.put("adherencePercent", adherence);
             mDatabase.child("reports").child(childId).setValue(meta);
         } catch (IOException e) {
@@ -392,14 +460,6 @@ public class ProviderReportActivity extends AppCompatActivity {
         return new File(dir, "provider_report_" + childId + ".pdf").getAbsolutePath();
     }
 
-    private List<RescueLog> filterRescues(List<RescueLog> source, long start, long end) {
-        List<RescueLog> list = new ArrayList<>();
-        for (RescueLog log : source) {
-            if (log.timestamp >= start && log.timestamp <= end) list.add(log);
-        }
-        return list;
-    }
-
     private List<ZoneSample> filterZones(List<ZoneSample> source, long start, long end) {
         List<ZoneSample> list = new ArrayList<>();
         for (ZoneSample sample : source) {
@@ -409,12 +469,9 @@ public class ProviderReportActivity extends AppCompatActivity {
     }
 
     private List<ZoneSample> buildDailyZoneSamples(List<ZoneSample> source, long start, long end) {
-        // Aggregate latest zone per day within range
         Map<String, ZoneSample> perDay = new HashMap<>();
         for (ZoneSample sample : source) {
             if (sample.timestamp < start || sample.timestamp > end) continue;
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(sample.timestamp);
             String key = dayKey(sample.timestamp);
             ZoneSample existing = perDay.get(key);
             if (existing == null || sample.timestamp > existing.timestamp) {
@@ -445,20 +502,45 @@ public class ProviderReportActivity extends AppCompatActivity {
         return Math.min(100, (completedDays / (double) plannedDays) * 100);
     }
 
+    private double calculateAdherenceEntries(List<ControllerLogEntry> entries, Map<String, Integer> plan, long start, long end) {
+        // Mirror parent dashboard monthly adherence: last 30 days, planned defaults to 0, days without a plan count as compliant
+        if (entries.isEmpty()) return -1;
+        Map<String, Integer> daily = new HashMap<>();
+        for (ControllerLogEntry e : entries) {
+            long ts = parseEntryTs(e.timestamp);
+            if (ts < start || ts > end) continue;
+            String key = dayKey(ts);
+            daily.put(key, daily.getOrDefault(key, 0) + e.doseCount);
+        }
+        if (plan == null) plan = new HashMap<>();
+
+        int plannedDays = 0;
+        int compliant = 0;
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(end);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        for (int i = 0; i < 30; i++) {
+            long t = cal.getTimeInMillis() - i * 24L * 60 * 60 * 1000;
+            String dayStr = getDayString(cal.get(Calendar.DAY_OF_WEEK));
+            int planned = plan.getOrDefault(dayStr, 0);
+            plannedDays++;
+            int actual = daily.getOrDefault(dayKey(t), 0);
+            if (actual >= planned) compliant++;
+            cal.add(Calendar.DAY_OF_YEAR, -1);
+        }
+
+        if (plannedDays == 0) return -1;
+        return Math.min(100, (compliant / (double) plannedDays) * 100);
+    }
+
     private int countSymptomBurden(List<SymptomLog> symptoms, long start, long end) {
         int count = 0;
         for (SymptomLog log : symptoms) {
             if (log.timestamp >= start && log.timestamp <= end && log.severity > 0) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private int countRescues(List<RescueLog> rescues, long start, long end) {
-        int count = 0;
-        for (RescueLog log : rescues) {
-            if (log.timestamp >= start && log.timestamp <= end) {
                 count++;
             }
         }
@@ -471,6 +553,26 @@ public class ProviderReportActivity extends AppCompatActivity {
             if (note.timestamp >= start && note.timestamp <= end && "escalated".equalsIgnoreCase(note.status)) {
                 count++;
             }
+        }
+        return count;
+    }
+
+    private List<Long> buildRescueTimestamps(List<RescueLogEntry> entries, List<RescueLog> legacy) {
+        List<Long> out = new ArrayList<>();
+        for (RescueLogEntry e : entries) {
+            long ts = parseEntryTs(e.timestamp);
+            if (ts > 0) out.add(ts);
+        }
+        for (RescueLog log : legacy) {
+            out.add(log.timestamp);
+        }
+        return out;
+    }
+
+    private int countTsInRange(List<Long> tsList, long start, long end) {
+        int count = 0;
+        for (Long ts : tsList) {
+            if (ts >= start && ts <= end) count++;
         }
         return count;
     }
@@ -504,7 +606,7 @@ public class ProviderReportActivity extends AppCompatActivity {
         canvas.drawText("Red", baseX + 200, yStart + 120, p);
     }
 
-    private void drawRescueSeries(Canvas canvas, int yStart, List<RescueLog> logs, long endMillis) {
+    private void drawRescueSeries(Canvas canvas, int yStart, List<Long> tsList, long endMillis) {
         int days = 30;
         long dayMs = 24L * 60 * 60 * 1000;
         List<Integer> daily = new ArrayList<>();
@@ -512,8 +614,8 @@ public class ProviderReportActivity extends AppCompatActivity {
             long start = endMillis - (i + 1) * dayMs;
             long end = endMillis - i * dayMs;
             int count = 0;
-            for (RescueLog log : logs) {
-                if (log.timestamp >= start && log.timestamp < end) count++;
+            for (Long ts : tsList) {
+                if (ts >= start && ts < end) count++;
             }
             daily.add(count);
         }
@@ -528,11 +630,6 @@ public class ProviderReportActivity extends AppCompatActivity {
         line.setStyle(Paint.Style.STROKE);
         line.setAntiAlias(true);
 
-        Paint fill = new Paint();
-        fill.setColor(Color.parseColor("#331E88E5"));
-        fill.setStyle(Paint.Style.FILL);
-        fill.setAntiAlias(true);
-
         Paint dot = new Paint();
         dot.setColor(Color.parseColor("#1E88E5"));
         dot.setStyle(Paint.Style.FILL);
@@ -542,7 +639,6 @@ public class ProviderReportActivity extends AppCompatActivity {
         int baseX = 40;
         int baseY = yStart + height;
 
-        // axes
         canvas.drawLine(baseX, yStart, baseX, baseY, axis);
         canvas.drawLine(baseX, baseY, baseX + width, baseY, axis);
 
@@ -558,8 +654,6 @@ public class ProviderReportActivity extends AppCompatActivity {
             prevX = x;
             prevY = y;
         }
-
-        // dots
         for (int i = 0; i < daily.size(); i++) {
             float x = baseX + (width / (float) Math.max(1, daily.size() - 1)) * i;
             float y = baseY - (daily.get(i) / (float) max) * height;
@@ -567,10 +661,31 @@ public class ProviderReportActivity extends AppCompatActivity {
         }
     }
 
+    private long parseEntryTs(String ts) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(ts).getTime();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     private String dayKey(long timestamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timestamp);
         return cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private String getDayString(int calendarDay) {
+        switch (calendarDay) {
+            case Calendar.SUNDAY: return "Sun";
+            case Calendar.MONDAY: return "Mon";
+            case Calendar.TUESDAY: return "Tue";
+            case Calendar.WEDNESDAY: return "Wed";
+            case Calendar.THURSDAY: return "Thu";
+            case Calendar.FRIDAY: return "Fri";
+            case Calendar.SATURDAY: return "Sat";
+            default: return "Mon";
+        }
     }
 
     static class ZoneSample {

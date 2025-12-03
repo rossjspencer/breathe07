@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import com.example.smartair.r3.ControllerLogEntry;
+import com.example.smartair.r3.RescueLogEntry;
 
 public class ProviderViewPatientActivity extends AppCompatActivity {
 
@@ -32,7 +33,7 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
     private TrendChartView trendChartView;
     private TextView tvTitle, tvSharingStatus, tvReportMeta, tvRescueStats, tvAdherenceStats, tvTriageStats;
     private Button btnViewPdf;
-    private final List<RescueLog> rescueLogs = new ArrayList<>();
+    private final List<RescueLogEntry> rescueLogs = new ArrayList<>();
     private final List<ControllerLogEntry> controllerLogs = new ArrayList<>();
     private final List<ZoneEntry> zoneEntries = new ArrayList<>();
     private final List<ProviderReportActivity.TriageNote> triageNotes = new ArrayList<>();
@@ -124,13 +125,18 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
     }
 
     private void listenForLogs() {
-        mDatabase.child("users").child(childId).child("rescueLogs")
+        // Use medicine_logs for parity with parent dashboard and PDF report
+        DatabaseReference medicineLogsRef = FirebaseDatabase
+                .getInstance("https://smartair-a6669-default-rtdb.firebaseio.com")
+                .getReference("medicine_logs");
+
+        medicineLogsRef.child("rescue").child(childId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         rescueLogs.clear();
                         for (DataSnapshot child : snapshot.getChildren()) {
-                            RescueLog log = child.getValue(RescueLog.class);
+                            RescueLogEntry log = child.getValue(RescueLogEntry.class);
                             if (log != null) rescueLogs.add(log);
                         }
                         refreshViews();
@@ -139,11 +145,6 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
-        // Updated to use medicine_logs/controller
-        DatabaseReference medicineLogsRef = FirebaseDatabase
-                .getInstance("https://smartair-a6669-default-rtdb.firebaseio.com")
-                .getReference("medicine_logs");
-                
         medicineLogsRef.child("controller").child(childId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -261,19 +262,21 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
     }
 
     private int countRescuesInDays(int days) {
-        long now = System.currentTimeMillis();
-        long range = days * 24L * 60 * 60 * 1000;
         int count = 0;
-        for (RescueLog log : rescueLogs) {
-            if (now - log.timestamp <= range) count++;
+        long now = System.currentTimeMillis();
+        long window = days * 24L * 60 * 60 * 1000;
+        for (RescueLogEntry log : rescueLogs) {
+            long ts = parseTimestamp(log.timestamp);
+            if (ts > 0 && now - ts <= window) count++;
         }
         return count;
     }
 
     private long latestRescueTs() {
         long latest = 0;
-        for (RescueLog log : rescueLogs) {
-            if (log.timestamp > latest) latest = log.timestamp;
+        for (RescueLogEntry log : rescueLogs) {
+            long ts = parseTimestamp(log.timestamp);
+            if (ts > latest) latest = ts;
         }
         return latest;
     }
@@ -286,8 +289,9 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
             long start = now - (i + 1) * dayMs;
             long end = now - i * dayMs;
             int c = 0;
-            for (RescueLog log : rescueLogs) {
-                if (log.timestamp >= start && log.timestamp < end) c++;
+            for (RescueLogEntry log : rescueLogs) {
+                long ts = parseTimestamp(log.timestamp);
+                if (ts >= start && ts < end) c++;
             }
             counts.add(c);
         }
@@ -369,6 +373,15 @@ public class ProviderViewPatientActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             Toast.makeText(this, "No shared PDF on this device. Ask parent to export and share.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private long parseTimestamp(String ts) {
+        if (ts == null) return 0;
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(ts).getTime();
+        } catch (Exception e) {
+            return 0;
         }
     }
 }
