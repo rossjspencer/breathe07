@@ -20,6 +20,7 @@ SmartAir bridges the gap between pediatric patients and their care network. It t
     *   **Streaks:** Tracks "Technique Streak" and "Controller Adherence Streak", obtained by consistently following a pre-set controller schedule with or without technique, respectively.
 *   **Asthma Action Plan:** Visual "Traffic Light" system (Green, Yellow, Red zones) based on Asthma Score and PEF (Peak Expiratory Flow) logs.
 *   **Medication Logging:** Easy interface to log Controller and Rescue inhaler doses.
+*   **Symptom & Trigger Logging:** Log daily symptoms and their triggers to keep a history for provider visits.
 
 ### For Parents (Monitoring & Safety)
 *   **Parent Dashboard:** Link and monitor multiple children from a single parent account.
@@ -36,7 +37,7 @@ SmartAir bridges the gap between pediatric patients and their care network. It t
     *   Tap on the Adherence tile on the Parent dashboard to view a detailed summary of your child's controller adherence.
     *   **Weekly View:** Breakdown of compliant vs. missed days based on the planned schedule.
     *   **Monthly Calendar:** Visual history of adherence success.
-*   **Symptom & Trigger Logging:** Log daily symptoms to keep a history for provider visits.
+*   **Symptom & Trigger Logging:** Log daily symptoms and triggers on behalf of a child to maintain a history for future provider visits.
 
 ### For Providers
 *   **Patient Oversight:** View patient lists and adherence data to make informed treatment adjustments.
