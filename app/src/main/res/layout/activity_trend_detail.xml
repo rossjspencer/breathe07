@@ -25,24 +25,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:baselineAligned="false"
         android:orientation="horizontal"
         android:layout_marginTop="12dp">
 
-    <Button
-        android:id="@+id/btnDetail7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="7d"
-        android:textColor="@android:color/black"
-        android:backgroundTint="#E0E0E0" />
+        <Button
+            android:id="@+id/btnDetail7"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="7d"
+            android:maxLines="1"
+            android:ellipsize="none"
+            android:paddingHorizontal="12dp"
+            android:textColor="@android:color/black"
+            android:backgroundTint="#E0E0E0" />
 
-    <Button
-        android:id="@+id/btnDetail30"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:text="30d"
-        android:textColor="@android:color/black"
-        android:backgroundTint="#E0E0E0" />
+        <Button
+            android:id="@+id/btnDetail30"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="12dp"
+            android:text="30d"
+            android:maxLines="1"
+            android:ellipsize="none"
+            android:paddingHorizontal="12dp"
+            android:textColor="@android:color/black"
+            android:backgroundTint="#E0E0E0" />
     </LinearLayout>
 </LinearLayout>

@@ -88,7 +88,5 @@ public class TrendChartView extends View {
             prevY = y;
         }
 
-        // Range label
-        canvas.drawText(rangeDays + " day trend", padding, padding + usableH + 40, textPaint);
-    }
+}
 }
