@@ -8,6 +8,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class LoginActivity extends AppCompatActivity implements LoginContract.View {
 
     private EditText emailField, passwordField;
@@ -33,7 +35,23 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         });
 
         // Keep forgot password logic simple or move to presenter later if needed
-        forgotPassword.setOnClickListener(v -> { /* Logic handled in AuthHelper or separate flow */ });
+        forgotPassword.setOnClickListener(v -> {
+            String email = emailField.getText().toString().trim();
+
+            if (email.isEmpty()) {
+                AuthHelper.showToast(this, "Please enter your email first");
+                return;
+            }
+
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            AuthHelper.showToast(this, "A reset link has been sent to your email");
+                        } else {
+                            AuthHelper.showToast(this, "Failed to send reset email");
+                        }
+                    });
+        });
     }
 
     @Override
