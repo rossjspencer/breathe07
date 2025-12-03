@@ -38,26 +38,9 @@
         android:layout_height="0dp"
         android:layout_marginVertical="16dp"
         app:layout_constraintTop_toBottomOf="@+id/tvInstructions"
-        app:layout_constraintBottom_toTopOf="@+id/log_symptoms_button"
+        app:layout_constraintBottom_toTopOf="@+id/btnLinkChild"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Daily Log Button -->
-
-    <Button
-        android:id="@+id/log_symptoms_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="Daily Symptom/Trigger Log"
-        android:textColor="#000000"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#10E6A6"
-        app:layout_constraintBottom_toTopOf="@id/btnLinkChild"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvLinkedChildren" />
 
     <!-- Register Child Button -->
     <Button

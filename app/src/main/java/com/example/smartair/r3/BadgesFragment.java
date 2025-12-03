@@ -98,7 +98,7 @@ public class BadgesFragment extends Fragment {
         textCurrentStreak = view.findViewById(R.id.textCurrentStreak);
         textCurrentStreak.setVisibility(View.INVISIBLE);
         
-        textControllerStreak = view.findViewById(R.id.textControllerStreak); // Bind
+        textControllerStreak = view.findViewById(R.id.textControllerStreak);
         textControllerStreak.setVisibility(View.INVISIBLE);
         
         loadingSpinner = view.findViewById(R.id.loadingSpinner);
@@ -142,7 +142,7 @@ public class BadgesFragment extends Fragment {
         applyGrayscale(badge2Image);
         applyGrayscale(badge3Image);
 
-        setupBadgeClick(badge1Frame, badge1Image, badge1Lock, "Beginner Breather", R.drawable.badge_ten_sessions);
+        setupBadgeClick(badge1Frame, badge1Image, badge1Lock, "Detail-Oriented", R.drawable.badge_ten_sessions);
         setupBadgeClick(badge2Frame, badge2Image, badge2Lock, "Consistent Controller", R.drawable.badge_perfect_week);
         setupBadgeClick(badge3Frame, badge3Image, badge3Lock, "Well Controlled", R.drawable.badge_low_rescue_month);
 
@@ -295,7 +295,7 @@ public class BadgesFragment extends Fragment {
                         } else {
                             startLockPulse(b1Lock);
                             b1Layout.setTag("READY");
-                            sendBadgeNotification("Beginner Breather");
+                            sendBadgeNotification("Detail-Oriented");
                         }
                     }
                 }
@@ -602,7 +602,7 @@ public class BadgesFragment extends Fragment {
                 GuideStats stats = snapshot.getValue(GuideStats.class);
                 if (stats != null) {
                     String id;
-                    if (badgeName.equals("Beginner Breather")) id = "badge_10_sessions";
+                    if (badgeName.equals("Detail-Oriented")) id = "badge_10_sessions";
                     else if (badgeName.equals("Consistent Controller")) id = "badge_perfect_week";
                     else id = "badge_well_controlled";
                     

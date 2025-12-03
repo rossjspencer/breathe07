@@ -64,6 +64,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
     private LinearLayout remindersLayout;
     private TrendChartView trendChartView;
     private Button btnRange7, btnRange30, btnGenerateReport, btnQuickRescue, btnQuickController, btnViewInventory, btnBadgeSettings, btnViewReport, btnExpandTrend;
+    private Button btnLogSymptoms;
     private Map<String, Boolean> sharingSettings = new HashMap<>();
 
     private final List<RescueLogEntry> rescueLogs = new ArrayList<>();
@@ -136,6 +137,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
         btnViewReport = findViewById(R.id.btnViewReport);
         btnExpandTrend = findViewById(R.id.btnExpandTrend);
         btnSetPb = findViewById(R.id.btn_set_pb);
+        btnLogSymptoms = findViewById(R.id.btnLogSymptoms);
 
         // Tiles
         cardZone = findViewById(R.id.cardZone);
@@ -224,7 +226,12 @@ public class ParentViewChildActivity extends AppCompatActivity {
             startActivity(i);
         });
 
-
+        btnLogSymptoms.setOnClickListener(v -> {
+            Intent intent = new Intent(ParentViewChildActivity.this, DailyLogActivity.class);
+            intent.putExtra("CHILD_ID", childId);
+            intent.putExtra("LOGGED_BY_ROLE", "Parent");
+            startActivity(intent);
+        });
     }
 
     private void openExistingReport() {
@@ -452,55 +459,80 @@ public class ParentViewChildActivity extends AppCompatActivity {
         double weeklyAdherence = calculateAdherenceForWeek(today, dailyCount);
         tvAdherenceWeekly.setText(String.format(Locale.getDefault(), "%.0f%%", weeklyAdherence));
 
-        // Monthly Calculation (Last 30 Days)
-        double monthlyAdherence = calculateAdherenceForLast30Days(today, dailyCount);
+        // Monthly Calculation (Current Month so far)
+        double monthlyAdherence = calculateAdherenceForMonth(today, dailyCount);
         tvAdherenceMonthly.setText(String.format(Locale.getDefault(), "%.0f%%", monthlyAdherence));
     }
 
     private double calculateAdherenceForWeek(Calendar today, Map<String, Integer> dailyCount) {
         Calendar cal = (Calendar) today.clone();
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        if (cal.after(today)) cal.add(Calendar.DAY_OF_YEAR, -7);
+        // If SUNDAY is after today (e.g., today is Tuesday, Sunday is future), that shouldn't happen
+        // because setting DAY_OF_WEEK to SUNDAY usually goes to the start of the week.
+        // But if the week starts on Monday for user, etc. (Locale-dependent logic might vary),
+        // Android's Calendar usually treats Sunday as start.
+        // Let's ensure we check the past 7 days OR the current week so far.
+        
+        // Let's stick to "Current Week" logic: Sunday to Today
+        if (cal.after(today)) {
+             cal.add(Calendar.DAY_OF_YEAR, -7);
+        }
+        
+        // Actually, to match "Adherence Summary" we should probably iterate Sunday -> Saturday
+        // But we only care about days UP TO today.
+        
+        // Re-align to start of week
+        cal.setTimeInMillis(today.getTimeInMillis());
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
         int plannedDays = 0;
         int compliantDays = 0;
 
         Calendar iter = (Calendar) cal.clone();
         for (int i = 0; i < 7; i++) {
-            if (iter.after(today)) break;
+            if (iter.after(today)) break; // Don't count future days
 
             int dayOfWeek = iter.get(Calendar.DAY_OF_WEEK);
             String dayStr = getDayString(dayOfWeek);
             int planned = plannedSchedule.getOrDefault(dayStr, 0);
 
-            plannedDays++;
-            String dKey = dayKey(iter.getTimeInMillis());
-            int actual = dailyCount.getOrDefault(dKey, 0);
-            if (actual >= planned) compliantDays++;
+            if (planned > 0) {
+                plannedDays++;
+                String dKey = dayKey(iter.getTimeInMillis());
+                int actual = dailyCount.getOrDefault(dKey, 0);
+                if (actual >= planned) compliantDays++;
+            }
+             // If planned == 0, we don't count it in the denominator? 
+             // Or count as compliant?
+             // Usually adherence = (compliant / total_active_days). 
+             // Let's assume if planned is 0, it doesn't affect score (skipped).
 
             iter.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        if (plannedDays == 0) return 100;
+        if (plannedDays == 0) return 100; // No meds planned this week so far
         return ((double) compliantDays / plannedDays) * 100;
     }
 
-    private double calculateAdherenceForLast30Days(Calendar today, Map<String, Integer> dailyCount) {
+    private double calculateAdherenceForMonth(Calendar today, Map<String, Integer> dailyCount) {
+        // Current Month (1st -> Today)
+        Calendar iter = (Calendar) today.clone();
+        iter.set(Calendar.DAY_OF_MONTH, 1);
+        
         int plannedDays = 0;
         int compliantDays = 0;
 
-        Calendar iter = (Calendar) today.clone();
-        iter.add(Calendar.DAY_OF_YEAR, -29);
-
-        for (int i = 0; i < 30; i++) {
+        while (!iter.after(today)) {
             int dayOfWeek = iter.get(Calendar.DAY_OF_WEEK);
             String dayStr = getDayString(dayOfWeek);
             int planned = plannedSchedule.getOrDefault(dayStr, 0);
 
-            plannedDays++;
-            String dKey = dayKey(iter.getTimeInMillis());
-            int actual = dailyCount.getOrDefault(dKey, 0);
-            if (actual >= planned) compliantDays++;
+            if (planned > 0) {
+                plannedDays++;
+                String dKey = dayKey(iter.getTimeInMillis());
+                int actual = dailyCount.getOrDefault(dKey, 0);
+                if (actual >= planned) compliantDays++;
+            }
 
             iter.add(Calendar.DAY_OF_YEAR, 1);
         }
@@ -725,17 +757,37 @@ public class ParentViewChildActivity extends AppCompatActivity {
             nm.createNotificationChannel(ch);
         }
     }
+    
+    // This map ensures we don't re-notify for the same incident ID
+    private final Map<String, Boolean> notifiedTriageIncidents = new HashMap<>();
+
     private void listenForTriageUpdates() {
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("children_triage_incidents")
                 .child(childId);
 
+        // Only listen for new children added after the listener is attached
+        // However, addChildEventListener will fire for existing children first.
+        // We need to filter out old incidents if we don't want notifications on startup.
+        // A common strategy is to check timestamps or only notify if the incident is very recent.
+        
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snap, String prev) {
                 TriageIncident inc = snap.getValue(TriageIncident.class);
-                if (inc != null) {
-                    showTriageNotification("New triage session started");
+                if (inc == null) return;
+                
+                // Check if this incident is "recent" enough to warrant a notification
+                // For example, created within the last 5 minutes.
+                long now = System.currentTimeMillis();
+                long incidentTime = inc.timestampMillis;
+                // If no timestamp, we might skip or assume it's new.
+                // Let's assume we only want to notify if it's < 10 minutes old
+                boolean isRecent = (Math.abs(now - incidentTime) < 10 * 60 * 1000);
+
+                if (isRecent && !notifiedTriageIncidents.containsKey(snap.getKey())) {
+                     showTriageNotification("New triage session started");
+                     notifiedTriageIncidents.put(snap.getKey(), true);
                 }
             }
 
@@ -743,7 +795,12 @@ public class ParentViewChildActivity extends AppCompatActivity {
             public void onChildChanged(@NonNull DataSnapshot snap, String prev) {
                 TriageIncident inc = snap.getValue(TriageIncident.class);
                 if (inc != null && Boolean.TRUE.equals(inc.escalated)) {
-                    showTriageNotification("Triage escalation detected!");
+                    // Use a specific key for escalation to avoid duplicate escalation alerts if desired
+                    String escalationKey = snap.getKey() + "_escalated";
+                    if (!notifiedTriageIncidents.containsKey(escalationKey)) {
+                        showTriageNotification("Triage escalation detected!");
+                        notifiedTriageIncidents.put(escalationKey, true);
+                    }
                 }
             }
 

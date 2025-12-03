@@ -175,7 +175,7 @@ public class InhalerFinishFragment extends Fragment {
 
                     // check badge one sessions
                     if (stats.totalSessions >= badge1Threshold && !stats.hasBadge("badge_10_sessions")) {
-                        sendBadgeNotification("Beginner Breather");
+                        sendBadgeNotification("Detail-Oriented");
                     }
                 }
 

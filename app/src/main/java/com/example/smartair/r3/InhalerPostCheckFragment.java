@@ -25,9 +25,7 @@ public class InhalerPostCheckFragment extends Fragment {
     private boolean isTechniqueSelected = false;
     private boolean isTechniqueSuccess = false;
     private boolean isFeelingWorse = false;
-    
-    // default fallback ID, can remove once testing is complete
-    private String currentUserId = "kqRPXqmnx5NzlrN5CT5L8vrxIhk1"; 
+    private String currentUserId = "DEFAULT_VALUE";
 
     @Nullable
     @Override
@@ -45,6 +43,10 @@ public class InhalerPostCheckFragment extends Fragment {
         RadioGroup radioGroupComparison = view.findViewById(R.id.radioGroupComparison);
         RadioGroup radioGroupTechnique = view.findViewById(R.id.radioGroupTechnique);
         Button nextButton = view.findViewById(R.id.postCheckNextButton);
+
+        // Initially disable and grey out
+        nextButton.setEnabled(false);
+        nextButton.setAlpha(0.5f);
 
         radioGroupBreathing.setOnCheckedChangeListener((group, checkedId) -> {
             isBreathingSelected = true;
@@ -88,7 +90,9 @@ public class InhalerPostCheckFragment extends Fragment {
     }
 
     private void checkEnableButton(Button button) {
-        button.setEnabled(isBreathingSelected && isComparisonSelected && isTechniqueSelected);
+        boolean enabled = isBreathingSelected && isComparisonSelected && isTechniqueSelected;
+        button.setEnabled(enabled);
+        button.setAlpha(enabled ? 1.0f : 0.5f);
     }
 
     private void navigateToFinish(boolean success) {

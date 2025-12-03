@@ -31,6 +31,10 @@ public class InhalerPreCheckFragment extends Fragment {
         RadioGroup radioGroupSpacer = view.findViewById(R.id.radioGroupSpacer);
         Button nextButton = view.findViewById(R.id.preCheckNextButton);
 
+        // initially disable and grey out
+        nextButton.setEnabled(false);
+        nextButton.setAlpha(0.5f);
+
         radioGroupBreathing.setOnCheckedChangeListener((group, checkedId) -> {
             isBreathingSelected = true;
             checkEnableButton(nextButton);
@@ -74,6 +78,8 @@ public class InhalerPreCheckFragment extends Fragment {
     }
 
     private void checkEnableButton(Button button) {
-        button.setEnabled(isBreathingSelected && isComparisonSelected && isSpacerSelected);
+        boolean enabled = isBreathingSelected && isComparisonSelected && isSpacerSelected;
+        button.setEnabled(enabled);
+        button.setAlpha(enabled ? 1.0f : 0.5f);
     }
 }
