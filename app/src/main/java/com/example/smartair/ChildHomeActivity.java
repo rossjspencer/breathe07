@@ -57,6 +57,20 @@ public class ChildHomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child_home);
+        
+        // Logout Button Logic
+        Button btnLogout = findViewById(R.id.btnLogoutChild);
+        btnLogout.setOnClickListener(v -> {
+            // If using Firebase Auth (unlikely for child, but possible for parent impersonating)
+            FirebaseAuth.getInstance().signOut();
+            
+            // Go to MainActivity (Login/Register)
+            Intent intent = new Intent(ChildHomeActivity.this, MainActivity.class);
+            // Clear the back stack so back button doesn't return here or exit app unexpectedly
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
 
         tvCurrentZone = findViewById(R.id.tvCurrentZone);
         tvZoneDescription = findViewById(R.id.tvZoneDescription);
