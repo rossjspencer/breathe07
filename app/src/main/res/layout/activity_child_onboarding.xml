@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="32dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#E4F1FF">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#000080"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kid!"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#10E6A6"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Here’s how your Child account works:\n\n• You can track your asthma control\n• See your inhaler stats\n• Learn from the guide animations\n• Complete daily tasks to stay healthy!"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:layout_marginBottom="40dp"
+        android:lineSpacingExtra="6dp"/>
+
+    <Button
+        android:id="@+id/child_continue_button"
+        android:layout_width="140dp"
+        android:layout_height="50dp"
+        android:text="Continue"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#10E6A6"
+        android:background="@drawable/rounded_button" />
+
+</LinearLayout>

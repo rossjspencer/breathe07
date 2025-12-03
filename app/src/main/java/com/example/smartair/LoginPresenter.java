@@ -1,5 +1,12 @@
 package com.example.smartair;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class LoginPresenter implements LoginContract.Presenter, LoginContract.Model.OnLoginFinishedListener {
 
     private final LoginContract.View view;
@@ -12,34 +19,79 @@ public class LoginPresenter implements LoginContract.Presenter, LoginContract.Mo
 
     @Override
     public void handleLogin(String input, String password) {
-        if (input == null || password == null || input.trim().isEmpty() || password.trim().isEmpty()) {
+        if (input.isEmpty() || password.isEmpty()) {
             view.showInputError();
             return;
         }
 
-        // Logic from your requirements: '@' means Parent/Provider, else Child
-        if (input.contains("@")) {
-            model.performParentLogin(input.trim(), password.trim(), this);
+        // Child login → uses username
+        if (!input.contains("@")) {
+            model.performChildLogin(input, password, this);
         } else {
-            model.performChildLogin(input.trim(), password.trim(), this);
+            // Parent/Provider login → uses email
+            model.performParentLogin(input, password, this);
         }
     }
 
     @Override
     public void onParentSuccess(String role) {
-        if ("Parent".equals(role)) {
-            view.navigateToParentHome();
-        } else if ("Provider".equals(role)) {
-            view.navigateToProviderHome();
-        } else {
-            view.showLoginError("Unknown role: " + role);
-        }
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(uid);
+
+        ref.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                view.showLoginError("Error loading profile");
+                return;
+            }
+
+            DataSnapshot snap = task.getResult();
+            Boolean done = snap.child("onboardingComplete").getValue(Boolean.class);
+            if (done == null) done = false;
+
+            // Route by role + onboarding state
+            switch (role) {
+
+                case "Parent":
+                    if (!done) {
+                        view.navigateToParentOnboarding();
+                    } else {
+                        view.navigateToParentHome();
+                    }
+                    break;
+
+                case "Provider":
+                    if (!done) {
+                        view.navigateToProviderOnboarding();
+                    } else {
+                        view.navigateToProviderHome();
+                    }
+                    break;
+
+                default:
+                    view.showLoginError("Unknown role: " + role);
+            }
+        });
     }
 
     @Override
     public void onChildSuccess(String childId, String firstName) {
-        view.showLoginSuccess("Welcome back, " + firstName);
-        view.navigateToChildHome(childId);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(childId);
+
+        ref.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                view.showLoginError("Error loading child data");
+                return;
+            }
+
+            Boolean done = task.getResult().child("onboardingComplete").getValue(Boolean.class);
+            if (done == null) done = false;
+
+            if (!done) {
+                view.navigateToChildOnboarding(childId);
+            } else {
+                view.navigateToChildHome(childId);
+            }
+        });
     }
 
     @Override

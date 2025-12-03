@@ -83,7 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String pass = etPass.getText().toString().trim();
 
-        //VALIDATION (From My branch)
+
         if (email.isEmpty() || pass.isEmpty()) {
             Toast.makeText(this, "Email/Password required", Toast.LENGTH_SHORT).show();
             return;
@@ -165,19 +165,27 @@ public class RegisterActivity extends AppCompatActivity {
                         user.lastName = last;
                     }
 
+                    // Set onboarding flag for ALL new accounts
+                    user.onboardingComplete = false;
+
                     db.child(uid).setValue(user).addOnSuccessListener(v -> {
+
+                        // Alternatively, if User class does NOT have onboardingComplete:
+                        // db.child(uid).child("onboardingComplete").setValue(false);
+
                         DatabaseReference statsRef = FirebaseDatabase.getInstance()
                                 .getReference("guide_stats")
                                 .child(uid);
 
                         statsRef.child("accountCreationDate")
-                                .setValue(ServerValue.TIMESTAMP); // BEST PRACTICE
+                                .setValue(ServerValue.TIMESTAMP);
 
                         startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                         finish();
                     });
                 });
     }
+
 }
 
 

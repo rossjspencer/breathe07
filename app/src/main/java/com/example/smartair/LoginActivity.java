@@ -70,4 +70,25 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         startActivity(intent);
         finish();
     }
+
+    @Override
+    public void navigateToParentOnboarding() {
+        startActivity(new Intent(this, ParentOnboardingActivity.class));
+        finish();
+    }
+
+    @Override
+    public void navigateToProviderOnboarding() {
+        startActivity(new Intent(this, ProviderOnboardingActivity.class));
+        finish();
+    }
+
+    @Override
+    public void navigateToChildOnboarding(String childId) {
+        Intent intent = new Intent(this, ChildOnboardingActivity.class);
+        intent.putExtra("CHILD_ID", childId);
+        startActivity(intent);
+        finish();
+    }
+
 }
