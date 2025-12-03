@@ -46,25 +46,38 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         }
 
         void bind(CalendarDay day) {
-            if (day.missedCount < 0) {
-                // for future days
+            // 1) Real blank cell used for grid padding
+            if (day.dayOfMonth == 0) {
                 tvDayNum.setText("");
                 tvMissedCount.setVisibility(View.GONE);
-                itemView.setBackground(null);
+                itemView.setBackgroundResource(0);
+                itemView.setAlpha(0.2f);
+                return;
+            }
+
+            // Always show the day number for real days
+            tvDayNum.setText(String.valueOf(day.dayOfMonth));
+
+            // 2) Future day (we used -2)
+            if (day.missedCount < 0) {
+                // muted look, no missed chip
+                tvMissedCount.setVisibility(View.GONE);
+                itemView.setBackgroundResource(R.drawable.calendar_day_bg);
+                itemView.setAlpha(0.5f);
+                return;
+            }
+
+            // 3) Past/today with data
+            itemView.setAlpha(1f);
+            if (day.missedCount == 0) {
+                itemView.setBackgroundResource(R.drawable.calendar_day_good);
+                tvMissedCount.setVisibility(View.GONE);
             } else {
-                tvDayNum.setText(String.valueOf(day.dayOfMonth));
-                
-                if (day.missedCount == 0) {
-                    // good day
-                    itemView.setBackgroundResource(R.drawable.calendar_day_good);
-                    tvMissedCount.setVisibility(View.GONE);
-                } else {
-                    // missed day
-                    itemView.setBackgroundResource(R.drawable.calendar_day_bg);
-                    tvMissedCount.setVisibility(View.VISIBLE);
-                    tvMissedCount.setText("-" + day.missedCount);
-                }
+                itemView.setBackgroundResource(R.drawable.calendar_day_bg);
+                tvMissedCount.setVisibility(View.VISIBLE);
+                tvMissedCount.setText("-" + day.missedCount);
             }
         }
+
     }
 }

@@ -5,10 +5,10 @@ public class ChildProfile {
     private String childId;
     private String parentUid;
     private String name;
-    private Integer personalBestPef;   // PB (nullable if not set)
+    private Integer personalBestPef;
     private String currentZone;        // "GREEN", "YELLOW", "RED", or null
 
-    // Required empty constructor for Firebase
+    // Empty constructor for Firebase
     public ChildProfile() { }
 
     public ChildProfile(String childId,
