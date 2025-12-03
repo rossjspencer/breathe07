@@ -295,7 +295,7 @@ public class BadgesFragment extends Fragment {
                         } else {
                             startLockPulse(b1Lock);
                             b1Layout.setTag("READY");
-                            sendBadgeNotification("Detail-Oriented");
+                            // sendBadgeNotification("Detail-Oriented");
                         }
                     }
                 }

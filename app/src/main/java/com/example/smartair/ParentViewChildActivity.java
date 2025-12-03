@@ -63,7 +63,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
     private View cardZone, cardRescue, cardTrend, cardAdherence;
     private LinearLayout remindersLayout;
     private TrendChartView trendChartView;
-    private Button btnRange7, btnRange30, btnGenerateReport, btnQuickRescue, btnQuickController, btnViewInventory, btnBadgeSettings, btnViewReport, btnExpandTrend;
+    private Button btnRange7, btnRange30, btnGenerateReport, btnQuickRescue, btnQuickController, btnViewInventory, btnBadgeSettings, btnViewReport, btnExpandTrend, btnLogSymptoms;
     private Map<String, Boolean> sharingSettings = new HashMap<>();
 
     private final List<RescueLogEntry> rescueLogs = new ArrayList<>();
@@ -135,6 +135,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
         btnBadgeSettings = findViewById(R.id.btnBadgeSettings);
         btnViewReport = findViewById(R.id.btnViewReport);
         btnExpandTrend = findViewById(R.id.btnExpandTrend);
+        btnLogSymptoms = findViewById(R.id.btnLogSymptoms);
         btnSetPb = findViewById(R.id.btn_set_pb);
 
         // Tiles
@@ -189,6 +190,18 @@ public class ParentViewChildActivity extends AppCompatActivity {
         btnExpandTrend.setOnClickListener(v -> {
             Intent intent = new Intent(this, TrendDetailActivity.class);
             intent.putExtra(TrendDetailActivity.EXTRA_CHILD_ID, childId);
+            startActivity(intent);
+        });
+
+        btnLogSymptoms.setOnClickListener(v -> {
+            Intent intent = new Intent(this, DailyLogActivity.class);
+            intent.putExtra("CHILD_ID", childId);
+            intent.putExtra("LOGGED_BY_ROLE", "Parent");
+            if (childProfile != null) {
+                String name = (childProfile.firstName != null ? childProfile.firstName : "") +
+                        (childProfile.lastName != null ? " " + childProfile.lastName : "");
+                intent.putExtra("CHILD_NAME", name.trim());
+            }
             startActivity(intent);
         });
 
@@ -448,12 +461,12 @@ public class ParentViewChildActivity extends AppCompatActivity {
             } catch (ParseException e) {}
         }
 
-        // Weekly Calculation (Current Week: Sun -> Today)
+        // weekly calculation (sun -> today)
         double weeklyAdherence = calculateAdherenceForWeek(today, dailyCount);
         tvAdherenceWeekly.setText(String.format(Locale.getDefault(), "%.0f%%", weeklyAdherence));
 
-        // Monthly Calculation (Last 30 Days)
-        double monthlyAdherence = calculateAdherenceForLast30Days(today, dailyCount);
+        // monthly calculation (current week)
+        double monthlyAdherence = calculateAdherenceForCurrentMonth(today, dailyCount);
         tvAdherenceMonthly.setText(String.format(Locale.getDefault(), "%.0f%%", monthlyAdherence));
     }
 
@@ -466,9 +479,7 @@ public class ParentViewChildActivity extends AppCompatActivity {
         int compliantDays = 0;
 
         Calendar iter = (Calendar) cal.clone();
-        for (int i = 0; i < 7; i++) {
-            if (iter.after(today)) break;
-
+        while (!iter.after(today)) {
             int dayOfWeek = iter.get(Calendar.DAY_OF_WEEK);
             String dayStr = getDayString(dayOfWeek);
             int planned = plannedSchedule.getOrDefault(dayStr, 0);
@@ -485,14 +496,14 @@ public class ParentViewChildActivity extends AppCompatActivity {
         return ((double) compliantDays / plannedDays) * 100;
     }
 
-    private double calculateAdherenceForLast30Days(Calendar today, Map<String, Integer> dailyCount) {
+    private double calculateAdherenceForCurrentMonth(Calendar today, Map<String, Integer> dailyCount) {
         int plannedDays = 0;
         int compliantDays = 0;
 
         Calendar iter = (Calendar) today.clone();
-        iter.add(Calendar.DAY_OF_YEAR, -29);
+        iter.set(Calendar.DAY_OF_MONTH, 1);
 
-        for (int i = 0; i < 30; i++) {
+        while (!iter.after(today)) {
             int dayOfWeek = iter.get(Calendar.DAY_OF_WEEK);
             String dayStr = getDayString(dayOfWeek);
             int planned = plannedSchedule.getOrDefault(dayStr, 0);
