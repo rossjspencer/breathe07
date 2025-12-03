@@ -53,6 +53,10 @@ public class HistoryActivity extends AppCompatActivity {
 
     private final String[] SYMPTOM_OPTIONS = {"Cough", "Wheezing", "Shortness of Breath", "Chest Tightness", "Night Waking"};
     private final String[] TRIGGER_OPTIONS = {"Dust", "Pollen", "Smoke", "Exercise", "Pets", "Cold air", "Illness", "Perfumes/Cleaners/Strong Odors"};
+    
+    // NEW: Flag to check if child is viewing their own logs
+    private boolean isChildViewingOwnLogs = false;
+    private String userRole = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,31 @@ public class HistoryActivity extends AppCompatActivity {
         
         if (getIntent().hasExtra("CHILD_NAME")) {
             childName = getIntent().getStringExtra("CHILD_NAME");
+        }
+        
+        // NEW: Determine viewer type
+        // If no Firebase Auth user, it is a Child using custom login.
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            isChildViewingOwnLogs = true;
+        } else {
+            // If logged in, verify role just in case
+            String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(currentUserId);
+            userRef.child("role").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        userRole = snapshot.getValue(String.class);
+                        // If the user is a Child (but using Auth), enforce the filter
+                        if ("Child".equals(userRole)) {
+                            isChildViewingOwnLogs = true;
+                        }
+                        // Re-apply filters in case logs loaded first
+                        applyFilters();
+                    }
+                }
+                @Override public void onCancelled(@NonNull DatabaseError error) {}
+            });
         }
 
         // Setup UI
@@ -188,6 +217,13 @@ public class HistoryActivity extends AppCompatActivity {
         long cutoff = System.currentTimeMillis() - (filterMonths * 30L * 24 * 60 * 60 * 1000);
 
         for (SymptomLog log : allLogs) {
+            // 0. Role Filter (Child sees only their own)
+            if (isChildViewingOwnLogs) {
+                if (log.loggedBy == null || !log.loggedBy.startsWith("Child")) {
+                    continue;
+                }
+            }
+
             // 1. Time Filter
             if (log.timestamp < cutoff) continue;
 
